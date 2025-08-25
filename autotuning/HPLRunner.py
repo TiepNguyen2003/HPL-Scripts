@@ -21,12 +21,15 @@ class HPLRunner:
     def runHPL(self) -> pd.DataFrame:
         result_path= str(HPL_RESULT_FOLDER.joinpath("hpl_output.log"))
         #print(HPL_EXEC_PATH.resolve() + "|>" + result_path)
+        print(HPL_EXEC_PATH.resolve())
         result_content = subprocess.run(
-            [HPL_EXEC_PATH.resolve()], stdout=subprocess.PIPE, 
+            ["./xhpl"], cwd=HPL_EXEC_FOLDER_PATH, stdout=subprocess.PIPE, 
             stderr=subprocess.PIPE, 
             text=True
         )
-
+        print("Content stdout")
+        print(result_content.stdout)
+        HPL_RESULT_FOLDER.mkdir(parents=True, exist_ok=True)
         with open(result_path, 'w') as file:
             file.write(result_content.stdout)
 

@@ -6,6 +6,8 @@ from HPLConfig import HPLConfig
 from HPLRunner import HPLRunner
 import pandas as pd
 from pathlib import Path
+from skopt.plots import plot_convergence
+
 
 
 hplRunner = HPLRunner()
@@ -39,6 +41,6 @@ def objectiveFunction(params):
     return results['Gflops'].max() * -1
 
 
-result= gp_minimize(objectiveFunction, space, n_calls=10, random_state=0)
+result= gp_minimize(objectiveFunction, space, n_calls=30, random_state=0)
 print(result)
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-Make_Template_Path="$Script_Dir/Make_Template.in"
+Make_Template_Path="$Script_Dir/templates/Make_Template.in"
 Config_Path="$Script_Dir/config.sh"
 source $Config_Path
 
@@ -74,7 +74,7 @@ sed -e 's%@SHELL@%'"$Shell"'%' \
     "$Make_Template_Path" > $Make_File
 
 
-make arch="$Make_Name" clean
+#make arch="$Make_Name" clean
 make arch="$Make_Name"
 
 
