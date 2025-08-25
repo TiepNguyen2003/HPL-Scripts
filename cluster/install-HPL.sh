@@ -26,7 +26,7 @@ LALib="$LADir/lib/libopenblas.so"
 
 F2Defs=
 
-HPL_Opts="-DHPL_DETAILED_TIMING -DHPL_PROGRESS_REPORT"
+HPL_Opts="-DHPL_PROGRESS_REPORWT"
 
 CC="$Install_Path"/"$MPI_Folder"/bin/mpicc
 CCNoOpt= # Includes $(HPL_DEFS)

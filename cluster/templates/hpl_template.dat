@@ -1,0 +1,31 @@
+HPLinpack benchmark input file
+Innovative Computing Laboratory, University of Tennessee
+@OUTPUT_NAME@      output file name (if any)
+@DEVICE_OUT@            device out (6=stdout,7=stderr,file)
+@PROBLEM_SIZE@            # of problems sizes (N)
+@N_ARRAY@  Ns
+@NB_COUNT@            # of NBs
+@NB_ARRAY@      NBs
+@PMAP_MAPPING@            PMAP process mapping (0=Row-,1=Column-major)
+@N_PROCESS_GRID@            # of process grids (P x Q)
+@P_ARRAY@        Ps
+@Q_ARRAY@        Qs
+@THRESHOLD@         threshold
+@N_PFACT@            # of panel fact
+@PFACT_ARRAY@        PFACTs (0=left, 1=Crout, 2=Right)
+@N_RECURSIVE_CRIT@            # of recursive stopping criterium
+@NBMIN_ARRAY@          NBMINs (>= 1)
+@N_PANEL_RECUR@            # of panels in recursion
+@NDIVS@            NDIVs
+@N_RFACTS@            # of recursive panel fact.
+@RFACT_ARRAY@        RFACTs (0=left, 1=Crout, 2=Right)
+@BCASTS@            # of broadcast
+@BCAST_ARRAY@            BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM)
+@LOOKAHEAD_DEPTH@            # of lookahead depth
+@N_DEPTHS@            DEPTHs (>=0)
+@SWAP_TYPE@            SWAP (0=bin-exch,1=long,2=mix)
+@SWAP_THRESHOLD@           swapping threshold
+@L1_FORM@            L1 in (0=transposed,1=no-transposed) form
+@U_FORM@            U  in (0=transposed,1=no-transposed) form
+@EQUILIBRATION@            Equilibration (0=no,1=yes)
+@MEM_ALIGN_DBL@            memory alignment in double (> 0)

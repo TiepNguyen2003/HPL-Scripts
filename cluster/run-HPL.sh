@@ -5,11 +5,13 @@ HPL_TEMPLATE_PATH=/home/tiep_nguyen/IndySCC-HPL-Scripts/hpl_template.dat
 HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine/HPL.dat
 XHPL_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine/xhpl
 
+
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source "$Script_Dir/setpath.sh"
 
-OUTPUT_NAME=HPL.dat # output file name (if any)
-DEVICE_OUT=6         #  device out (6=stdout,7=stderr,file)
+# default values 
+OUTPUT_NAME=resultNum # output file name (if any)
+DEVICE_OUT=file         #  device out (6=stdout,7=stderr,file)
 PROBLEM_SIZE=4            # of problems sizes (N)
 N_ARRAY="29 30 34 35"
 NB_COUNT=4    
@@ -38,6 +40,10 @@ U_FORM=0
 EQUILIBRATION=1   # 0=no,1=yes       
 MEM_ALIGN_DBL=8             
 
+
+
+
+# writes to output
 sed -e 's%@OUTPUT_NAME@%'"$OUTPUT_NAME"'%' \
     -e 's%@DEVICE_OUT@%'"$DEVICE_OUT"'%' \
     -e 's%@PROBLEM_SIZE@%'"$PROBLEM_SIZE"'%' \
@@ -68,4 +74,5 @@ sed -e 's%@OUTPUT_NAME@%'"$OUTPUT_NAME"'%' \
     -e 's%@EQUILIBRATION@%'"$EQUILIBRATION"'%' \
     -e 's%@MEM_ALIGN_DBL@%'"$MEM_ALIGN_DBL"'%' \
     "$HPL_TEMPLATE_PATH" > "$HPL_DAT_PATH"
+
 $XHPL_PATH

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 Install_Path="$HOME/HPL-Folder"
-Build_Process_Count=1
+Build_Process_Count=8
 
 OPENMPI_URL="https://download.open-mpi.org/release/open-mpi/v5.0/openmpi-5.0.8.tar.gz"
 BLAS_URL="https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30.tar.gz"
