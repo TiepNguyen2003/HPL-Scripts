@@ -42,6 +42,7 @@ class HPLRunner:
     '''
     def runHPL(self) -> pd.DataFrame:        
         #print(HPL_EXEC_PATH.resolve() + "|>" + result_path)
+        print(HPL_EXEC_PATH.resolve())
         result_content = subprocess.run(
             ['mpirun', '-np', str(self.numProcess), 'xhpl'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

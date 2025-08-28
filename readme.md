@@ -1,3 +1,4 @@
+Ensure all variables are set properly
 Installation instructions
 - Run install-HPL-Dependencies
 - Run install-HPL

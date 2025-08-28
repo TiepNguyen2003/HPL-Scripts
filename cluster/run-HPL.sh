@@ -1,16 +1,18 @@
 #!/bin/bash
 #https://www.netlib.org/benchmark/hpl/tuning.html
 #https://www.mgaillard.fr/2022/08/27/benchmark-with-hpl.html
-HPL_TEMPLATE_PATH=/home/tiep_nguyen/IndySCC-HPL-Scripts/hpl_template.dat
-HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine/HPL.dat
-XHPL_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine/xhpl
 
 
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+HPL_TEMPLATE_PATH=$Script_Dir/templates/hpl_template.dat
+HPL_DAT_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/local_machine/HPL.dat
+XHPL_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/local_machine/xhpl
+XHPL_FOLDER=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/local_machine/
 source "$Script_Dir/setpath.sh"
 
 # default values 
-OUTPUT_NAME=resultNum # output file name (if any)
+OUTPUT_NAME=output.log # output file name (if any)
 DEVICE_OUT=6         #  device out (6=stdout,7=stderr,file)
 PROBLEM_SIZE=4            # of problems sizes (N)
 N_ARRAY="29 30 34 35"
@@ -75,4 +77,5 @@ sed -e 's%@OUTPUT_NAME@%'"$OUTPUT_NAME"'%' \
     -e 's%@MEM_ALIGN_DBL@%'"$MEM_ALIGN_DBL"'%' \
     "$HPL_TEMPLATE_PATH" > "$HPL_DAT_PATH"
 
-$XHPL_PATH
+cd $XHPL_FOLDER
+./xhpl
