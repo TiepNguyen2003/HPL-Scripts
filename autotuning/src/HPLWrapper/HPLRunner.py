@@ -1,38 +1,74 @@
+import sys
+from pathlib import Path
+print(Path(__file__).parent.parent.parent.resolve())
+sys.path.append(str(Path(__file__).parent.parent.parent.resolve()))
+from config import HPL_EXEC_FOLDER_PATH, RESULTS_PATH
+
+
 from logging import config
 from typing import List
-from config import HPL_EXEC_FOLDER_PATH
+import psutil
 from HPLConfig import HPLConfig
 from pathlib import Path
 import pandas as pd
 from HPLResultReader import process_hpl_output
 import subprocess
+from datetime import datetime
 
-HPL_PARAMETER_TEMPLATE = Path(__file__).parent.joinpath("templates","hpl_template.dat")
+HPL_PARAMETER_TEMPLATE = Path(__file__).parent.parent.parent.joinpath("templates","hpl_template.dat")
 HPL_EXEC_PATH = HPL_EXEC_FOLDER_PATH.joinpath("xhpl")
-HPL_RESULT_FOLDER = Path(__file__).parent.joinpath("results")
 
 class HPLRunner:
     config:HPLConfig = None
+    numProcess: int = 1
+    _currentLogCount:int # the current new log
     
+    _iterator_path = Path(RESULTS_PATH.joinpath("logs","count"))
+    def __init__(self):
+        self.numProcess = psutil.cpu_count(logical=False)
+        
+        
+        try:
+            with open(self._iterator_path, 'r') as file:
+                content = (file.read().strip())
+                print(f"Read iterator file, content is '{content}'")
+                self._currentLogCount = int(content)
+        except (FileNotFoundError, ValueError):
+            self._currentLogCount = 0
+        
 
     '''
     Runs HPL benchmark. Returns the list of Gflops from execution
     '''
-    def runHPL(self) -> pd.DataFrame:
-        result_path= str(HPL_RESULT_FOLDER.joinpath("hpl_output.log"))
+    def runHPL(self) -> pd.DataFrame:        
         #print(HPL_EXEC_PATH.resolve() + "|>" + result_path)
         result_content = subprocess.run(
-            [HPL_EXEC_PATH.resolve()], stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE, 
-            text=True
+            ['mpirun', '-np', str(self.numProcess), 'xhpl'], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            cwd=HPL_EXEC_FOLDER_PATH
         )
+        print("the commandline is {}".format(result_content.args))
 
+
+        result_path = RESULTS_PATH.joinpath("logs", f"hpl_output_{self._currentLogCount}.log")
+        dataframe_path = RESULTS_PATH.joinpath("dataframes", f"hpl_output_{self._currentLogCount}.csv")
+        result_path.parent.mkdir(parents=True, exist_ok=True)
+        print(result_path.resolve())
+        #print(result_content.stdout)
+        #print(result_content.stderr)
         with open(result_path, 'w') as file:
             file.write(result_content.stdout)
+            self._currentLogCount+=1
+        with open(self._iterator_path, 'w') as file:
+            file.write(str(self._currentLogCount))
 
         dataframe : pd.DataFrame = process_hpl_output(Path(result_path))
 
         # process content
+
+        with open(dataframe_path, 'w') as file:
+            file.write(dataframe.to_csv(index=False))
 
         return dataframe
 

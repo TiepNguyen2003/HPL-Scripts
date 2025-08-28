@@ -1,8 +1,7 @@
+import sys
 from pathlib import Path
 import re
 import pandas as pd
-csv_path = Path("/home/tiep_nguyen/IndySCC-HPL-Scripts/analysis/output.csv")
-
 
 # designed to match with output from HPL_pdtest.C
 pattern = re.compile(
@@ -39,13 +38,7 @@ def process_hpl_output(file : Path) -> pd.DataFrame:
                 # convert numeric fields
                 print(result)
                 results.append(result)
-    current_data = None
-    try:
-        current_data = pd.read_csv(csv_path)
-        current_data=pd.concat([current_data, pd.DataFrame(results)], ignore_index=True)
-    except (FileNotFoundError, pd.errors.EmptyDataError):
-        current_data=pd.DataFrame(results)
-    
+    current_data=pd.DataFrame(results)
     current_data["Gflops"] = current_data["Gflops"].astype(float)
 
 

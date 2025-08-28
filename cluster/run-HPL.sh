@@ -11,7 +11,7 @@ source "$Script_Dir/setpath.sh"
 
 # default values 
 OUTPUT_NAME=resultNum # output file name (if any)
-DEVICE_OUT=file         #  device out (6=stdout,7=stderr,file)
+DEVICE_OUT=6         #  device out (6=stdout,7=stderr,file)
 PROBLEM_SIZE=4            # of problems sizes (N)
 N_ARRAY="29 30 34 35"
 NB_COUNT=4    

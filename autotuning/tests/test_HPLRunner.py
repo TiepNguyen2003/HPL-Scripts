@@ -1,11 +1,10 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+sys.path.append(str(Path(__file__).parent.parent.joinpath("src/HPLWrapper").resolve()))
 
-from pathlib import Path
 from HPLConfig import HPLConfig
-from HPLRunner import HPLRunner, HPL_RESULT_FOLDER
+from HPLRunner import HPLRunner
 import pandas as pd
 
 config = HPLConfig(
@@ -27,13 +26,11 @@ def test_setconfig():
     assert runner.config == config
 
 def test_runHPL():
-    result_path = HPL_RESULT_FOLDER.joinpath("hpl_output.log")
 
     runner = HPLRunner()
     runner.setconfig(config)
     dataframe: pd.DataFrame = runner.runHPL()
 
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
-    assert result_path.exists(), f"{result_path} was not created"
     assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
     assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
