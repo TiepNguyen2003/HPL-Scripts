@@ -28,6 +28,7 @@ class HPLConfig:
     Equilibration_Enabled: bool = True  # (False = no, True = yes) line 30
     MemoryAlignment: int = 8 # line 31
 
+    '''Defines if HPL Config is valid (although not necessarily on this machine)'''
     def isValid(self) -> bool:
 
         if (len(self.P_Array) != len(self.Q_Array)):

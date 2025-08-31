@@ -1,3 +1,4 @@
+import struct
 import sys
 from pathlib import Path
 print(Path(__file__).parent.parent.parent.resolve())
@@ -6,7 +7,7 @@ from config import HPL_EXEC_FOLDER_PATH, RESULTS_PATH
 
 
 from logging import config
-from typing import List
+from typing import List, Optional
 import psutil
 from HPLConfig import HPLConfig
 from pathlib import Path
@@ -20,8 +21,10 @@ HPL_EXEC_PATH = HPL_EXEC_FOLDER_PATH.joinpath("xhpl")
 
 class HPLRunner:
     config:HPLConfig = None
-    numProcess: int = 1
+    numProcess: int
     _currentLogCount:int # the current new log
+    
+
     
     _iterator_path = Path(RESULTS_PATH.joinpath("logs","count"))
     def __init__(self):
@@ -31,7 +34,7 @@ class HPLRunner:
         try:
             with open(self._iterator_path, 'r') as file:
                 content = (file.read().strip())
-                print(f"Read iterator file, content is '{content}'")
+                print(f"Read iterator file, content is on count '{content}'")
                 self._currentLogCount = int(content)
         except (FileNotFoundError, ValueError):
             self._currentLogCount = 0
@@ -39,8 +42,28 @@ class HPLRunner:
 
     '''
     Runs HPL benchmark. Returns the list of Gflops from execution
+    Returns None on failure
     '''
-    def runHPL(self) -> pd.DataFrame:        
+    def runHPL(self) -> Optional[pd.DataFrame]:
+        # Sanity Checks (Ensures the partition is runnable)
+
+        currentAvailMemory = psutil.virtual_memory().available
+        print(currentAvailMemory)
+        for n in self.config.N_Array:
+            if n <= 0:
+                print(f"Invalid problem size: {n}")
+                return None
+            
+            if (n^2 * struct.calcsize("d") > currentAvailMemory):
+                print(f"Problem size too large!")
+                return None
+        for p in self.config.P_Array:
+            for q in self.config.Q_Array:
+                if p * q > self.numProcess:
+                    print(f"Process grid {p}x{q} exceeds available processes {self.numProcess}")
+                    return None
+
+        # 
         #print(HPL_EXEC_PATH.resolve() + "|>" + result_path)
         print(HPL_EXEC_PATH.resolve())
         result_content = subprocess.run(
@@ -55,9 +78,9 @@ class HPLRunner:
         result_path = RESULTS_PATH.joinpath("logs", f"hpl_output_{self._currentLogCount}.log")
         dataframe_path = RESULTS_PATH.joinpath("dataframes", f"hpl_output_{self._currentLogCount}.csv")
         result_path.parent.mkdir(parents=True, exist_ok=True)
-        print(result_path.resolve())
-        #print(result_content.stdout)
-        #print(result_content.stderr)
+        #print(result_path.resolve())
+        print(result_content.stdout)
+        print(result_content.stderr)
         with open(result_path, 'w') as file:
             file.write(result_content.stdout)
             self._currentLogCount+=1

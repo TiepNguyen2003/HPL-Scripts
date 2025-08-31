@@ -8,10 +8,10 @@ from HPLRunner import HPLRunner
 import pandas as pd
 
 config = HPLConfig(
-    N_Array=[30],
-    NB_Array=[1],
-    P_Array=[1],
-    Q_Array=[1],
+    N_Array=[26500],
+    NB_Array=[100],
+    P_Array=[4],
+    Q_Array=[2],
     PFact_Array=[0, 1, 2],
     NBMin_Array=[1, 2],
     NDIV_Array=[2],
