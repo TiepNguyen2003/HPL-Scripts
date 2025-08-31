@@ -23,9 +23,9 @@ RESULTS_FOLDER = Path(__file__).parent.joinpath("results")
 
 availableMemory = psutil.virtual_memory().available
 # Formula from https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
-NRatio = sqrt(availableMemory/struct.calcsize("d")) 
+FullN = sqrt(availableMemory/struct.calcsize("d")) 
 space= Space([
-    Integer(0.2*NRatio,0.4*NRatio, name="N"),
+    Integer(0.2*FullN,0.4*FullN, name="N"),
     Integer(16,300, name="NB"), # recommended to be 256
     Integer(1,hplRunner.numProcess, name="P")
 ])
