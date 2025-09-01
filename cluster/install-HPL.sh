@@ -15,7 +15,6 @@ Arch=$Make_Name
 
 TopDir="$Install_Path/hpl-2.3"
 
-
 MPDir="$MPI_PATH"
 MPInc= #-I$"$MPDir"/include
 MPLib= #"$MPDir"/lib/libmpi.la
