@@ -6,9 +6,9 @@
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 HPL_TEMPLATE_PATH=$Script_Dir/templates/hpl_template.dat
-HPL_DAT_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/local_machine/HPL.dat
-XHPL_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/local_machine/xhpl
-XHPL_FOLDER=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/local_machine/
+HPL_DAT_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/HPL.dat
+XHPL_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/xhpl
+XHPL_FOLDER=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/
 source "$Script_Dir/setpath.sh"
 
 # default values 

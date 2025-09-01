@@ -7,7 +7,7 @@ source $Config_Path
 
 
 # Local Config
-Make_Name="local_machine"
+Make_Name="pinnacles"
 
 Shell=/bin/sh
 # shellcheck disable=SC2016
