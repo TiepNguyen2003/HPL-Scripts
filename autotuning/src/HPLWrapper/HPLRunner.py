@@ -36,12 +36,6 @@ class HPLRunner:
     _iterator_path = Path(RESULTS_PATH.joinpath("logs","count"))
     def __init__(self):
         # detect number of available processes
-        if "SLURM_JOB_ID" in os.environ: 
-            self.numProcess = int(os.environ.get("SLURM_NPROCS"))
-            if (self.numProcess < 1):
-                raise RuntimeError("SLURM_NTASKS environment variable not found or invalid.")
-        else:
-            self.numProcess = psutil.cpu_count(logical=False)
         
         # create folders
         RESULTS_PATH.joinpath("dataframes").mkdir(parents=True, exist_ok=True)

@@ -1,25 +1,50 @@
+from enum import Enum
+import string
 import sys
 from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent.resolve())) 
 
-
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import List
+from skopt.space import Space, Real, Integer, Categorical
+from config import MAXIMUM_HPL_N, NUM_PROCESS
 
+#region Enums
+class PMapEnum(Enum):
+    Row = 0
+    Column = 1
+
+class BCastEnum(Enum):
+    OneRing = 0
+    OneRingM = 1
+    TwoRing = 2
+    TwoRingM = 3
+    Blong = 4
+    BlongM = 5
+class PFactEnum(Enum):
+    Left = 0
+    Crout = 1
+    Right = 2
+class RFactEnum(Enum):
+    Left = 0
+    Crout = 1
+    Right = 2
+#endregion
 @dataclass
 class HPLConfig:
     Output_Name: str = "output.log"
     Device_Out: str = "6" # 6 for stdout, 7 for stin, file for file
     N_Array: List[int] = field(default_factory=list)  # line 5-6
     NB_Array: List[int] = field(default_factory=list) # line 7-8
-    PMAP_Process_Mapping: int = 0  # (0 = row, 1 = column-major) # line 9
+    PMAP_Process_Mapping: PMapEnum = PMapEnum.Row  # (0 = row, 1 = column-major) # line 9
     P_Array: List[int] = field(default_factory=list) # line 11
     Q_Array: List[int] = field(default_factory=list) # line 12
     Threshold: float = 16.0 # line 13
-    PFact_Array: List[int] = field(default_factory=lambda: [0, 1, 2]) # line 14-15
+    PFact_Array: List[PFactEnum] = field(default_factory=lambda: [PFactEnum.Left, PFactEnum.Crout, PFactEnum.Right]) # line 14-15
     NBMin_Array: List[int] = field(default_factory=list) # line 16-17
     NDIV_Array: List[int] = field(default_factory=list) # line 18-19
-    RFact_Array: List[int] = field(default_factory=lambda: [0, 1, 2])  # (0=left, 1=Crout, 2=Right) line 20-21
-    BCAST_Array: List[int] = field(default_factory=lambda: [0])  # (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM) line 22-23
+    RFact_Array: List[RFactEnum] = field(default_factory=lambda: [RFactEnum.Left, RFactEnum.Crout, RFactEnum.Right])  # (0=left, 1=Crout, 2=Right) line 20-21
+    BCAST_Array: List[BCastEnum] = field(default_factory=lambda: [BCastEnum.OneRing])  # (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM) line 22-23
     Depth_Array: List[int] = field(default_factory=lambda: [0]) # line 24-25
     Swap_Type: int = 0  # 0=bin-exch,1=long,2=mix # line 26
     Swap_Threshold: int = 60 # line 27
@@ -30,7 +55,57 @@ class HPLConfig:
 
     '''Defines if HPL Config is valid (although not necessarily on this machine)'''
     def isValid(self) -> bool:
-
         if (len(self.P_Array) != len(self.Q_Array)):
             return False
         return True
+
+    def __eq__(self, other):
+       if not isinstance(other, HPLConfig):
+           return NotImplemented
+       return self.__dict__ == other.__dict__
+    def __post_init__(self):
+        # auto-convert int to Enum
+        self.PFact_Array = [PFactEnum(x) if isinstance(x, int) else x for x in self.PFact_Array]
+        self.RFact_Array = [RFactEnum(x) if isinstance(x, int) else x for x in self.RFact_Array]
+        self.BCAST_Array = [BCastEnum(x) if isinstance(x, int) else x for x in self.BCAST_Array]
+
+        if isinstance(self.PMAP_Process_Mapping, int):
+            self.PMAP_Process_Mapping = PMapEnum(self.PMAP_Process_Mapping)
+
+        # validate types
+        
+
+'''Class describes  an HPL run'''
+@dataclass
+class HPL_Run:
+    source_file : string # name of the hpl.dat file
+    N: int
+    NB: int
+    PMAP_Process_Mapping: PMapEnum
+    P: int # nprow
+    Q: int # ncol
+    Threshold: float 
+    Equilibration_Enabled: bool 
+    BCast: BCastEnum # ctop  
+    PFact: PFactEnum # cpfact
+    RFact: RFactEnum # crfact
+    Nbdiv: int 
+    Depth: int
+    wTime: float
+    Align: float
+    L1: int
+    U: int
+    Gflops: float
+
+    def __post_init__(self):
+        # auto-convert int to Enum
+        if isinstance(self.BCast, int):
+            self.BCast = BCastEnum(self.BCast)
+        if isinstance(self.PFact, int):
+            self.PFact = PFactEnum(self.PFact)
+        if isinstance(self.RFact, int):
+            self.RFact = RFactEnum(self.RFact)
+        if isinstance(self.PMAP_Process_Mapping, int):
+            self.PMAP_Process_Mapping = PMapEnum(self.PMAP_Process_Mapping)
+
+

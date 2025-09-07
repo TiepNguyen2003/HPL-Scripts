@@ -6,9 +6,9 @@
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 HPL_TEMPLATE_PATH=$Script_Dir/templates/hpl_template.dat
-HPL_DAT_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/HPL.dat
+HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine/HPL.dat
 XHPL_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/xhpl
-XHPL_FOLDER=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/
+XHPL_FOLDER=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine
 source "$Script_Dir/setpath.sh"
 
 # default values 
@@ -31,9 +31,9 @@ N_PANEL_RECUR=1
 NDIVS=2           
 N_RFACTS=3      
 RFACT_ARRAY="0 1 2"  #0=left, 1=Crout, 2=Right
-BCASTS=1 #
-BCAST_ARRAY="0" #0=bin-exch, 1=long, 2=mix
-LOOKAHEAD_DEPTH=1  #  0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM   
+BCASTS=6 #
+BCAST_ARRAY="0 1 2 3 4 5" #  0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM   
+LOOKAHEAD_DEPTH=1  
 N_DEPTHS=0           
 SWAP_TYPE=2 #   (0=bin-exch,1=long,2=mix)        
 SWAP_THRESHOLD=64   

@@ -41,8 +41,6 @@ def test_setconfig():
     assert runner.config == config
 
 def test_runHPL():
-    pytest.skip("Skipping test_runHPL on login node")
-
     runner = HPLRunner()
     runner.setconfig(config)
     dataframe: pd.DataFrame = runner.runHPL()
