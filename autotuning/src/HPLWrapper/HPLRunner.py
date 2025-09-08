@@ -31,9 +31,11 @@ class HPLRunner:
     numProcess: int
     _currentLogCount:int # the current new log
     
-
+    
     
     _iterator_path = Path(RESULTS_PATH.joinpath("logs","count"))
+    log_folder : Path = RESULTS_PATH.joinpath("logs")
+    csv_folder : Path = RESULTS_PATH.joinpath("count")
     def __init__(self):
         # detect number of available processes
         
@@ -83,8 +85,8 @@ class HPLRunner:
         print("the commandline is {}".format(result_content.args))
 
 
-        result_path = RESULTS_PATH.joinpath("logs", f"hpl_output_{self._currentLogCount}.log")
-        dataframe_path = RESULTS_PATH.joinpath("dataframes", f"hpl_output_{self._currentLogCount}.csv")
+        result_path = self.log_folder.joinpath(f"hpl_output_{self._currentLogCount}.log")
+        dataframe_path = self.csv_path.joinpath(f"hpl_output_{self._currentLogCount}.csv")
         #print(result_path.resolve())
         print(result_content.stdout)
         print(result_content.stderr)

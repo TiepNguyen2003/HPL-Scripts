@@ -29,6 +29,11 @@ class RFactEnum(Enum):
     Left = 0
     Crout = 1
     Right = 2
+
+class SwapEnum(Enum):
+    BinExch = 0
+    Long = 1
+    Mix = 2
 #endregion
 @dataclass
 class HPLConfig:
@@ -46,8 +51,8 @@ class HPLConfig:
     RFact_Array: List[RFactEnum] = field(default_factory=lambda: [RFactEnum.Left, RFactEnum.Crout, RFactEnum.Right])  # (0=left, 1=Crout, 2=Right) line 20-21
     BCAST_Array: List[BCastEnum] = field(default_factory=lambda: [BCastEnum.OneRing])  # (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM) line 22-23
     Depth_Array: List[int] = field(default_factory=lambda: [0]) # line 24-25
-    Swap_Type: int = 0  # 0=bin-exch,1=long,2=mix # line 26
-    Swap_Threshold: int = 60 # line 27
+    Swap_Type: SwapEnum = SwapEnum.BinExch  # 0=bin-exch,1=long,2=mix # line 26
+    Swap_Threshold: int = 64 # line 27
     L1_Form: int = 0  # 0=transposed,1=no-transpose line 28
     U_Form: int = 0  # 0=transposed,1=no-transpose line 29
     Equilibration_Enabled: bool = True  # (False = no, True = yes) line 30
@@ -69,6 +74,7 @@ class HPLConfig:
         self.RFact_Array = [RFactEnum(x) if isinstance(x, int) else x for x in self.RFact_Array]
         self.BCAST_Array = [BCastEnum(x) if isinstance(x, int) else x for x in self.BCAST_Array]
 
+        self.Swap_Type = SwapEnum(self.Swap_Type) if isinstance(self.Swap_Type, int) else self.Swap_Type
         if isinstance(self.PMAP_Process_Mapping, int):
             self.PMAP_Process_Mapping = PMapEnum(self.PMAP_Process_Mapping)
 
@@ -93,6 +99,7 @@ class HPL_Run:
     Depth: int
     wTime: float
     Align: float
+    SwapType: SwapEnum
     L1: int
     U: int
     Gflops: float
@@ -107,5 +114,20 @@ class HPL_Run:
             self.RFact = RFactEnum(self.RFact)
         if isinstance(self.PMAP_Process_Mapping, int):
             self.PMAP_Process_Mapping = PMapEnum(self.PMAP_Process_Mapping)
+        if isinstance(self.SwapType, int):
+            self.SwapType = SwapEnum(self.SwapType)
 
-
+        self.N = int(self.N)
+        self.NB = int(self.NB)
+        self.P = int(self.P)
+        self.Q = int(self.Q)
+        self.Equilibration_Enabled = bool(self.Equilibration_Enabled)
+        self.Threshold = float(self.Threshold)
+        self.Nbdiv = float(self.Threshold)
+        self.Depth = int(self.Depth)
+        self.wTime = float(self.wTime)
+        self.Align = float(self.Align)
+        self.L1 = int(self.L1)
+        self.U = int(self.U)
+        self.Gflops = float(self.Gflops)
+        

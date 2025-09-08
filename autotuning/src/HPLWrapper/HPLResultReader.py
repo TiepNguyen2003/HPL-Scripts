@@ -4,7 +4,18 @@ import re
 from typing import List
 import pandas as pd
 csv_path = Path("/home/tiep_nguyen/IndySCC-HPL-Scripts/analysis/output.csv")
-from HPLConfig import HPLConfig, HPL_Run, BCastEnum, PFactEnum, RFactEnum, PMapEnum
+from HPLConfig import HPLConfig, HPL_Run, BCastEnum, PFactEnum, RFactEnum, PMapEnum, SwapEnum
+
+def is_hpl_config(file: Path) -> bool:
+    results=[]
+    with file.open(mode='r', encoding='utf-8') as f:
+        data = f.readlines()
+        for i in range(min(len(data), 5)):
+            curLine = data[i]
+            if "High-Performance Linpack benchmark" in str(curLine):
+                return True 
+        return False
+
 
 # designed to match with output from HPL_pdtest.C
 hpl_result_regex = re.compile(
@@ -34,6 +45,9 @@ hpl_residual_regex = re.compile(
 TODO, write documentation on this type of result
 '''
 def process_hpl_output(file : Path) -> pd.DataFrame:
+    if is_hpl_config(file) == False:
+        raise ValueError("{file} is not an HPLConfig")
+    
     results=[]
     with file.open(mode='r', encoding='utf-8') as f:
         data = f.readlines()
@@ -63,6 +77,9 @@ hpl_config_regex= re.compile(r"(\w+)\s*:\s*(.+)")
 
 def get_hpl_config(file : Path) -> HPLConfig:
 
+    if is_hpl_config(file) == False:
+        raise ValueError("{file} is not an HPLConfig")
+    
     # reading
     with file.open(mode='r', encoding='utf-8') as f:
         fullcontent = f.readlines()
@@ -96,17 +113,21 @@ def get_hpl_config(file : Path) -> HPLConfig:
     results['DEPTH'] = int(results['DEPTH'])
 
     if "Binary" in str(results['SWAP']):
-        results['SWAP'] = 0
+        results['SWAP'] = SwapEnum.BinExch
     if "Long" in str(results['SWAP']):
-        results['SWAP'] = 1
+        results['SWAP'] = SwapEnum.Long
     if "Mix" in str(results['SWAP']):
-        results['SWAP'] = 2
-    
+        results['SWAP'] = SwapEnum.Mix
+
     if "no" not in str(results['L1']):
         results['L1'] = 0
+    else:
+        results['L1'] = 1
 
     if "no" not in str(results['U']):
         results['U'] = 0
+    else:
+        results['U'] = 1
 
     if "yes" in str(results['EQUIL']):
         results['EQUIL'] = True
@@ -114,8 +135,6 @@ def get_hpl_config(file : Path) -> HPLConfig:
         results['EQUIL'] = False
 
     alignNumbers = re.findall(r"\d+", results['ALIGN'])
-
-
     if (len(alignNumbers) > 1):
         raise ValueError("Multiple numbers found in ALIGN: " + results['ALIGN'])
 
@@ -174,6 +193,9 @@ def get_hpl_config(file : Path) -> HPLConfig:
     return config
 
 def get_hpl_runs(file : Path) -> List[HPL_Run]:
+
+    if is_hpl_config(file) == False:
+        raise ValueError("{file} is not an HPLConfig")
     config = get_hpl_config(file)
 
     results=[]
@@ -238,7 +260,8 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
             Gflops=result['Gflops'],
             Align=config.MemoryAlignment,
             L1=config.L1_Form,
-            U=config.U_Form
+            U=config.U_Form,
+            SwapType=config.Swap_Type
         )
         runs.append(run)
     return runs

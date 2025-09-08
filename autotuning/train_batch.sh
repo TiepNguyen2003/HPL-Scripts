@@ -14,9 +14,11 @@ set HPL_RUNNER_MEM=150000
 
 source /home/tnguyen668/software/HPL-Scripts/cluster/setpath.sh
 source /home/tnguyen668/software/HPL-Scripts/autotuning/.venv/bin/activate # put your virtual environment here
-cd /home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles
-mpirun -np 56 ./xhpl
-#pytest /home/tnguyen668/software/HPL-Scripts/autotuning/optimize.py -s
+
+# tests
+
+
+
 # Please avoid using the ampersand (&) with "srun" if you intend to run processes in the background.
 
 
