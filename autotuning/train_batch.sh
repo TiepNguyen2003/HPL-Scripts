@@ -19,6 +19,8 @@ source /home/tnguyen668/software/HPL-Scripts/autotuning/.venv/bin/activate # put
 
 
 
+
+
 # Please avoid using the ampersand (&) with "srun" if you intend to run processes in the background.
 
 
