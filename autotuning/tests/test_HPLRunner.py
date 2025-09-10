@@ -49,6 +49,16 @@ def test_runHPL():
     assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
     assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
 
+def test_runHPL_2():
+    runner = HPLRunner()
+    runner.setconfig(config)
+    dataframe: pd.DataFrame = runner.runHPL()
+
+    dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
+    assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
+    assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
+
+
 def test_runSLURM():
     pytest.skip()
     if shutil.which("sbatch") is None:

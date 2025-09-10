@@ -180,6 +180,8 @@ class HPLRunner:
             filecontent = file.read()
             print("Opened " + str(HPL_PARAMETER_TEMPLATE))
 
+
+            
             filecontent = filecontent.replace("@OUTPUT_NAME@", config.Output_Name)
             filecontent = filecontent.replace("@DEVICE_OUT@", config.Device_Out)
             filecontent = filecontent.replace("@PROBLEM_SIZE@", str(len(config.N_Array)))
