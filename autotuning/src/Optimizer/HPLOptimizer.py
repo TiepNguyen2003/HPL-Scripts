@@ -11,9 +11,9 @@ from config import MAXIMUM_HPL_N, NUM_PROCESS
 from HPLConfig import HPLConfig, HPL_Run, PMapEnum, BCastEnum, PFactEnum, RFactEnum
 
 
-#MAXIMUM_HPL_N*0.9
+
 hpl_config_space = Space([
-    Integer(2,1500, name="N"),
+    Integer(2,MAXIMUM_HPL_N*0.9, name="N"),
     Integer(1,300, name="NB"), # recommended to be 256
     Integer(0, NUM_PROCESS,name="P"),
     Integer(0, NUM_PROCESS,name="Q"),
@@ -22,7 +22,7 @@ hpl_config_space = Space([
     Categorical(list(RFactEnum), name="RFact"),
     Categorical(list(BCastEnum), name="BCast"),
     Integer(1, 20, name="NBMin"),
-    Integer(1, 20, name = "NDiv"),
+    Integer(2, 20, name = "NDiv"),
     Integer(0, 5, name="Depth"),
     #Categorical([0,1], name="L1"),
     #Categorical([0,1], name="U"),
@@ -95,12 +95,12 @@ class HPLOptimizer:
             # convert x to a dictionary
             param_dict = {dim.name: val for dim, val in zip(hpl_config_space.dimensions, x)}
 
+            if (param_dict['P'] == 0):
+                param_dict['P'] = 1
+            #
             param_dict['Q'] = (int(NUM_PROCESS / int(param_dict['P'])))
             # sanity checks
-            if (param_dict['P'] == 0 or param_dict['Q'] == 0):
-                param_dict['P'] = 1
-                param_dict['Q'] = 1
-            #
+            
             if (int(param_dict['N']) < int(param_dict['NB'])):
                 param_dict['NB'] = param_dict['N']
 
