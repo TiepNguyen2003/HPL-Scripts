@@ -79,6 +79,22 @@ class HPLConfig:
             self.PMAP_Process_Mapping = PMapEnum(self.PMAP_Process_Mapping)
 
         # validate types
+
+        for val in self.PFact_Array:
+            if isinstance(val,PFactEnum) is False:
+                raise ValueError("PFact not enum")
+
+        for val in self.RFact_Array:
+            if isinstance(val,RFactEnum) is False:
+                raise ValueError("Rfact not enum")
+        
+        for val in self.BCAST_Array:
+            if isinstance(val,BCastEnum) is False:
+                raise ValueError("Bcast not enum")
+        
+        if isinstance(self.PMAP_Process_Mapping, PMapEnum) is False:
+            raise ValueError("PMAP not enum")
+        
         
 
 '''Class describes  an HPL run'''
