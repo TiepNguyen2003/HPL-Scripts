@@ -75,7 +75,7 @@ class HPLOptimizer:
             N_Array=[param_dict['N']],
             NB_Array=[param_dict['NB']],
             P_Array=[param_dict['P']],
-            Q_Array=[],
+            Q_Array=[param_dict['Q']],
             PMAP_Process_Mapping=param_dict['PMap'],
             PFact_Array=[param_dict['PFact']],
             RFact_Array=[param_dict['RFact']],
