@@ -171,7 +171,7 @@ class HPLRunner:
     '''
     def setconfig(self, config : HPLConfig):
         print(config)
-        print(config._listEnum_to_string(config.PFact_Array))
+        print(self._listEnum_to_string(config.PFact_Array))
         if config.isValid() == False:
             raise ValueError("Invalid HPLConfig: please check your configuration settings.")
         filecontent="temp"
@@ -197,7 +197,7 @@ class HPLRunner:
             filecontent = filecontent.replace("@N_PFACT@", str(len(config.PFact_Array)))
             filecontent = filecontent.replace("@PFACT_ARRAY@", self._listEnum_to_string(config.PFact_Array))
             filecontent = filecontent.replace("@N_RECURSIVE_CRIT@", str(len(config.NBMin_Array)))
-            filecontent = filecontent.replace("@NBMIN_ARRAY@", self._listEnum_to_string(config.NBMin_Array))
+            filecontent = filecontent.replace("@NBMIN_ARRAY@", self._list_to_string(config.NBMin_Array))
             filecontent = filecontent.replace("@N_PANEL_RECUR@", str(len(config.NDIV_Array)))
             filecontent = filecontent.replace("@NDIVS@", self._list_to_string(config.NDIV_Array))
             filecontent = filecontent.replace("@N_RFACTS@", str(len(config.RFact_Array)))

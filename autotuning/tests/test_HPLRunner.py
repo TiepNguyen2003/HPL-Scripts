@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("src/HPLWrapper").resolve()))
 
-from HPLConfig import HPLConfig
+from HPLConfig import HPLConfig, BCastEnum, RFactEnum, PFactEnum, PMapEnum
 from HPLRunner import HPLRunner
 from SLURMConfig import SLURMConfig
 import pandas as pd
@@ -12,7 +12,7 @@ import pytest
 
 
 config = HPLConfig(
-    N_Array=[1500],
+    N_Array=[50],
     NB_Array=[1],
     P_Array=[1],
     Q_Array=[1],
@@ -21,6 +21,20 @@ config = HPLConfig(
     NDIV_Array=[2],
     RFact_Array=[0, 1, 2],
     BCAST_Array=[0],
+    Depth_Array=[0],
+)
+
+config2 = HPLConfig(
+    N_Array=[50],
+    NB_Array=[1],
+    P_Array=[1],
+    Q_Array=[1],
+    PMAP_Process_Mapping= PMapEnum.Column,
+    PFact_Array=[PFactEnum.Left, PFactEnum.Crout, PFactEnum.Right],
+    NBMin_Array=[1, 2],
+    NDIV_Array=[2],
+    RFact_Array=[RFactEnum.Left, RFactEnum.Crout, RFactEnum.Right],
+    BCAST_Array=[BCastEnum.OneRing, BCastEnum.OneRingM],
     Depth_Array=[0],
 )
 
@@ -42,7 +56,7 @@ def test_setconfig():
 
 def test_runHPL():
     runner = HPLRunner()
-    runner.setconfig(config)
+    runner.setconfig(config2)
     dataframe: pd.DataFrame = runner.runHPL()
 
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
