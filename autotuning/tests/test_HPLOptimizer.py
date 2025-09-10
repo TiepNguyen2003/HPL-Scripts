@@ -25,6 +25,6 @@ def test_tell():
 def test_ask():
     test_tell()
     config = hpl_optimizer.ask_next()
-
+    print(config)
     assert isinstance(config, HPLConfig), "Config not HPLConfig"
     assert config.isValid() == True, "Config is not valid"

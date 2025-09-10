@@ -161,11 +161,13 @@ class HPLRunner:
 
 
 
-    def _list_to_string(self,list : List) -> str:
-        return " ".join(map(str, list))
+    def _list_to_string(self,l : List) -> str:
+        return " ".join(map(str, l))
     
-    def _listEnum_to_string(self,list : List) -> str:
-        return " ".join(map(lambda c: str(c.value), list))
+    def _listEnum_to_string(self,l : List) -> str:
+        l = list(l)
+
+        return " ".join(map(lambda c: str(c.value), l))
     '''
     Sets the config file for HPL
     '''

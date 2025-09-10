@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 import struct
 import psutil
-HPL_EXEC_FOLDER_PATH : Path= Path("/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles")
+HPL_EXEC_FOLDER_PATH : Path= Path("/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine")
 RESULTS_PATH= Path(__file__).parent.joinpath("results")
 
 NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 1))

@@ -255,6 +255,7 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
             PFact=result['cpfact'], # cpfact
             RFact=result['crfact'], # crfact
             Nbdiv=result['nbdiv'], 
+            Nbmin=result['nbmin'],
             Depth=result['depth'],
             wTime=result['wtime'],
             Gflops=result['Gflops'],

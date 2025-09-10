@@ -11,25 +11,27 @@ from config import MAXIMUM_HPL_N, NUM_PROCESS
 from HPLConfig import HPLConfig, HPL_Run, PMapEnum, BCastEnum, PFactEnum, RFactEnum
 
 
-
+#MAXIMUM_HPL_N*0.9
 hpl_config_space = Space([
-    Integer(MAXIMUM_HPL_N*0.6,MAXIMUM_HPL_N*0.9, name="N"),
+    Integer(2,1500, name="N"),
     Integer(1,300, name="NB"), # recommended to be 256
     Integer(0, NUM_PROCESS,name="P"),
     Integer(0, NUM_PROCESS,name="Q"),
-    Categorical(list(PMapEnum), name="PMap"),
+    #Categorical(list(PMapEnum), name="PMap"),
     Categorical(list(PFactEnum), name="PFact"),
     Categorical(list(RFactEnum), name="RFact"),
     Categorical(list(BCastEnum), name="BCast"),
+    Integer(1, 20, name="NBMin"),
+    Integer(1, 20, name = "NDiv"),
     Integer(0, 5, name="Depth"),
-    Categorical([0,1], name="L1"),
-    Categorical([0,1], name="U"),
-    Categorical([0,1], name="Equilibration_Enabled")
+    #Categorical([0,1], name="L1"),
+    #Categorical([0,1], name="U"),
+    #Categorical([0,1], name="Equilibration_Enabled")
 ])
 
 class HPLOptimizer:
     optimizer : Optimizer
-
+    runs_per_ask : int = 5 # how many runs per ask it should ask
     def __init__(self):
         self.optimizer = Optimizer(
             dimensions=hpl_config_space.dimensions,
@@ -44,33 +46,21 @@ class HPLOptimizer:
         x = [run.N, 
              run.NB, 
              run.P, 
-             run.Q, 
-             run.PMAP_Process_Mapping,
+             run.Q,
              run.PFact,
              run.RFact,
              run.BCast,
-             run.Depth,
-             run.L1,
-             run.U,
-             int(run.Equilibration_Enabled)]
+             run.Nbmin,
+             run.Nbdiv,
+             run.Depth
+             ]
         
         print(x)
         self.optimizer.tell(x, run.Gflops)
     
     def ask_next(self) -> HPLConfig:
-        x = self.optimizer.ask()
-        # convert x to a dictionary
-        param_dict = {dim.name: val for dim, val in zip(hpl_config_space.dimensions, x)}
-
-        param_dict['Q'] = int(NUM_PROCESS / param_dict['P'])
-        # sanity checks
-        if (param_dict['P'] == 0 or param_dict['Q'] == 0):
-            param_dict['P'] = 1
-            param_dict['Q'] = 1
-        #
-        if (param_dict['N'] < param_dict['NB']):
-            param_dict['NB'] = param_dict['N']
-
+        
+        '''
         hpl_config = HPLConfig(
             N_Array=[param_dict['N']],
             NB_Array=[param_dict['NB']],
@@ -81,9 +71,63 @@ class HPLOptimizer:
             RFact_Array=[param_dict['RFact']],
             BCAST_Array=[param_dict['BCast']],
             Depth_Array=[param_dict['Depth']],
+            NBMin_Array=[param_dict['NBMin']],
+            NDIV_Array=[param_dict['NDiv']],
             L1_Form=param_dict['L1'],
             U_Form=param_dict['U'],
             Equilibration_Enabled=bool(param_dict['Equilibration_Enabled'])
+        )
+        '''
+
+        _N_Array = []
+        _NB_Array = []
+        _P_Array = []
+        _Q_Array = []
+        _PFact_Array = set()
+        _RFact_Array = set()
+        _BCAST_Array = set()
+        _Depth_Array = []
+        _NBMin_Array = []
+        _NDIV_Array = []
+
+        for i in range(self.runs_per_ask):
+            x = self.optimizer.ask()
+            # convert x to a dictionary
+            param_dict = {dim.name: val for dim, val in zip(hpl_config_space.dimensions, x)}
+
+            param_dict['Q'] = (int(NUM_PROCESS / int(param_dict['P'])))
+            # sanity checks
+            if (param_dict['P'] == 0 or param_dict['Q'] == 0):
+                param_dict['P'] = 1
+                param_dict['Q'] = 1
+            #
+            if (int(param_dict['N']) < int(param_dict['NB'])):
+                param_dict['NB'] = param_dict['N']
+
+            _N_Array.append(param_dict['N'])
+            _NB_Array.append(param_dict['NB'])
+            _P_Array.append(param_dict['P'])
+            _Q_Array.append(param_dict['Q'])
+            _PFact_Array.add(param_dict['PFact'])
+            _RFact_Array.add(param_dict['RFact'])
+            _Depth_Array.append(param_dict['Depth'])
+            _NBMin_Array.append(param_dict['NBMin'])
+            _NDIV_Array.append(param_dict['NDiv'])
+            _BCAST_Array.add(param_dict['BCast'])
+        hpl_config = HPLConfig(
+            N_Array=_N_Array,
+            NB_Array=_NB_Array,
+            P_Array=_P_Array,
+            Q_Array=_Q_Array,
+            PFact_Array=_PFact_Array,
+            RFact_Array=_RFact_Array,
+            BCAST_Array=_BCAST_Array,
+            Depth_Array=_Depth_Array,
+            NBMin_Array=_NBMin_Array,
+            NDIV_Array=_NDIV_Array,
+            L1_Form=0,
+            U_Form=0,
+            Equilibration_Enabled=1
         )
 
         return hpl_config
