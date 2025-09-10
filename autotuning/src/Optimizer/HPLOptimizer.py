@@ -13,7 +13,7 @@ from HPLConfig import HPLConfig, HPL_Run, PMapEnum, BCastEnum, PFactEnum, RFactE
 
 
 hpl_config_space = Space([
-    Integer(0,MAXIMUM_HPL_N, name="N"),
+    Integer(MAXIMUM_HPL_N*0.6,MAXIMUM_HPL_N*0.9, name="N"),
     Integer(1,300, name="NB"), # recommended to be 256
     Integer(0, NUM_PROCESS,name="P"),
     Integer(0, NUM_PROCESS,name="Q"),
@@ -62,17 +62,20 @@ class HPLOptimizer:
         # convert x to a dictionary
         param_dict = {dim.name: val for dim, val in zip(hpl_config_space.dimensions, x)}
 
+        param_dict['Q'] = int(NUM_PROCESS / param_dict['P'])
         # sanity checks
         if (param_dict['P'] == 0 or param_dict['Q'] == 0):
             param_dict['P'] = 1
             param_dict['Q'] = 1
         #
+        if (param_dict['N'] < param_dict['NB']):
+            param_dict['NB'] = param_dict['N']
 
         hpl_config = HPLConfig(
             N_Array=[param_dict['N']],
             NB_Array=[param_dict['NB']],
             P_Array=[param_dict['P']],
-            Q_Array=[param_dict['Q']],
+            Q_Array=[],
             PMAP_Process_Mapping=param_dict['PMap'],
             PFact_Array=[param_dict['PFact']],
             RFact_Array=[param_dict['RFact']],

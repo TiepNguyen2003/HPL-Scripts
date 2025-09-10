@@ -57,7 +57,7 @@ class IncrementalOptimizer():
         self._serialize()
     ''' Sets the next config of HPLRunner'''
     def set_next_config(self):
-        config :HPLConfig = self.HPLOptimizer.ask_next()
+        config : HPLConfig = self.optimizer.ask_next()
 
         self.hplrunner.setconfig(config)
 

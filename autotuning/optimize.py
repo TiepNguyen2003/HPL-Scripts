@@ -21,6 +21,14 @@ if __name__ == "__main__":
             optimizer.process_file(path)
     optimizer.set_next_config()
 
+    optimizer.hplrunner.runHPL()
+
+    for path in RUN_FOLDER.iterdir():
+        if path.is_file() and is_hpl_config(path) is True:
+            optimizer.process_file(path)
+
+
+
 
 
 
