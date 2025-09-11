@@ -23,9 +23,9 @@ hpl_result_regex = re.compile(
     r"(?P<depth>\d)"            # algorithm depth
     r"(?P<ctop>.)"              # char
     r"(?P<crfact>.)"            # char
-    r"(?P<nbdiv>\d)"            # int
+    r"(?P<nbdiv>\d+)"            # int
     r"(?P<cpfact>.)"            # char
-    r"(?P<nbmin>\d)"            # int
+    r"(?P<nbmin>\d+)"            # int
     r"\s*(?P<N>\d+)"            # int
     r"\s+(?P<NB>\d+)"           # int
     r"\s+(?P<nprow>\d+)"        # int
@@ -97,20 +97,22 @@ def get_hpl_config(file : Path) -> HPLConfig:
                 results[key]=value
     print(results)
     # preprocessing
-    results['N'] = int(results['N'])
-    results['NB'] = int(results['NB'])
+    results['N'] = list(map(int,results['N'].split()))
+    results['NB'] = list(map(int,results['NB'].split()))
 
     if results['PMAP'] == 'Row-major process mapping':
-        results['PMAP'] = 0
+        results['PMAP'] = PMapEnum.Row
     elif results['PMAP'] == 'Column-major process mapping':
-        results['PMAP'] = 1
+        results['PMAP'] = PMapEnum.Column
     else:
         raise ValueError("Unknown PMAP value: " + results['PMAP'])
-    results['P'] = int(results['P'])
-    results['Q'] = int(results['Q'])
-    results['NDIV'] = int(results['NDIV'])
+    results['P'] = list(map(int,results['P'].split()))
+    results['Q'] = list(map(int,results['Q'].split()))
+    results['NDIV'] = list(map(int,results['NDIV'].split()))
+    results['NBMIN'] = list(map(int,results['NBMIN'].split()))
 
-    results['DEPTH'] = int(results['DEPTH'])
+
+    results['DEPTH'] = list(map(int,results['DEPTH'].split()))
 
     if "Binary" in str(results['SWAP']):
         results['SWAP'] = SwapEnum.BinExch
@@ -173,17 +175,17 @@ def get_hpl_config(file : Path) -> HPLConfig:
 
     # object to return
     config = HPLConfig(
-        N_Array=[results['N']],
-        NB_Array=[results['NB']],
+        N_Array=results['N'],
+        NB_Array=results['NB'],
         PMAP_Process_Mapping=results['PMAP'],
-        P_Array=[results['P']],
-        Q_Array=[results['Q']],
+        P_Array=results['P'],
+        Q_Array=results['Q'],
         PFact_Array=Pfact_Array,
-        NBMin_Array=[1, 2], #TODO
-        NDIV_Array=[results['NDIV']],
+        NBMin_Array=results['NBMIN'], #TODO
+        NDIV_Array=results['NDIV'],
         RFact_Array=Rfact_Array,
         BCAST_Array=Bcast_Array,
-        Depth_Array=[results['DEPTH']],
+        Depth_Array=results['DEPTH'],
         Swap_Type=results['SWAP'],
         L1_Form=results['L1'],
         U_Form=results['U'],
@@ -211,6 +213,8 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
                  # convert numeric fields
                 #print(result)
                 results.append(result)
+            elif curLine[0] == "W":
+                print(i+1)
             
             match = hpl_residual_regex.match(curLine)
             if match:
@@ -218,7 +222,7 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
                 residuals.append(residual)
     
     if (len(residuals) != len(results)):
-        raise ValueError("Number of residuals does not match number of results")
+        raise ValueError(f"Number of residuals: {len(residuals)} does not match number of results: {len(results)}")
 
     runs = []
     for i in range(len(results)):

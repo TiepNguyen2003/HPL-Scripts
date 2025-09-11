@@ -119,7 +119,9 @@ class HPLConfig:
         if isinstance(self.PMAP_Process_Mapping, PMapEnum) is False:
             raise ValueError("PMAP not enum")
 
+        print(self.NDIV_Array)
         for val in self.NDIV_Array:
+            
             if val < 2:
                 raise ValueError("NDIV less than 2")
         

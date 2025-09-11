@@ -31,7 +31,7 @@ hpl_config_space = Space([
 
 class HPLOptimizer:
     optimizer : Optimizer
-    runs_per_ask : int = 5 # how many runs per ask it should ask
+    runs_per_ask : int = 3 # how many runs per ask it should ask
     def __init__(self):
         self.optimizer = Optimizer(
             dimensions=hpl_config_space.dimensions,

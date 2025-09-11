@@ -7,8 +7,9 @@ from HPLRunner import HPLRunner
 from HPLResultReader import get_hpl_runs
 from HPLConfig import HPLConfig, HPL_Run
 import json
+import os
 WRITE_FOLDER = Path(__file__).parent.joinpath("cache")
-
+WRITE_FOLDER.mkdir(parents=True, exist_ok=)
 
 
 class IncrementalOptimizer():
@@ -23,7 +24,6 @@ class IncrementalOptimizer():
                 self.filesRead = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             self.filesRead = []
-
 
         try:
             with open(WRITE_FOLDER.joinpath("optimizer.pk1"), "r") as f:
