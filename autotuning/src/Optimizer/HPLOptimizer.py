@@ -9,11 +9,13 @@ sys.path.append(str(Path(__file__).parent.parent.parent.resolve()))
 
 from config import MAXIMUM_HPL_N, NUM_PROCESS
 from HPLConfig import HPLConfig, HPL_Run, PMapEnum, BCastEnum, PFactEnum, RFactEnum
+from typing import List
+
 
 
 
 hpl_config_space = Space([
-    Integer(2,MAXIMUM_HPL_N*0.9, name="N"),
+    Integer(0.5*MAXIMUM_HPL_N,MAXIMUM_HPL_N*0.8, name="N"),
     Integer(1,300, name="NB"), # recommended to be 256
     Integer(0, NUM_PROCESS,name="P"),
     Integer(0, NUM_PROCESS,name="Q"),
@@ -31,7 +33,9 @@ hpl_config_space = Space([
 
 class HPLOptimizer:
     optimizer : Optimizer
-    runs_per_ask : int = 3 # how many runs per ask it should ask
+    runs_per_ask : int = 2 # how many runs per ask it should ask
+    
+    
     def __init__(self):
         self.optimizer = Optimizer(
             dimensions=hpl_config_space.dimensions,
@@ -54,9 +58,19 @@ class HPLOptimizer:
              run.Nbdiv,
              run.Depth
              ]
-        
-        print(x)
         self.optimizer.tell(x, run.Gflops)
+    def get_run_count(self):
+        return len(self.optimizer.Xi)
+
+    def tell_runs(self, runs : List[HPL_Run]):
+        #TODO, add flexibility so that variables can easily be removed from space
+        x = [[r.N, r.NB, r.P, r.Q, r.PFact, r.RFact, r.BCast, r.Nbmin, r.Nbdiv, r.Depth] for r in runs]
+
+        gflops : List[float] = list(map(lambda c: -1 * c.Gflops, runs)) # maximize Gflops by minimizing -Gflops
+
+
+        
+        self.optimizer.tell(x, gflops)
     
     def ask_next(self) -> HPLConfig:
         

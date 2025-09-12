@@ -73,7 +73,7 @@ sed -e 's%@SHELL@%'"$Shell"'%' \
     "$Make_Template_Path" > $Make_File
 
 
-#make arch="$Make_Name" clean
+make arch="$Make_Name" clean
 make arch="$Make_Name"
 
 

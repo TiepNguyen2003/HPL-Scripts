@@ -6,7 +6,7 @@ import psutil
 HPL_EXEC_FOLDER_PATH : Path= Path("/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles")
 RESULTS_PATH= Path(__file__).parent.joinpath("results")
 
-NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 1))
+NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 8))
 
 _availableMemory = int(os.getenv("HPL_RUNNER_MEM", "150000")) # memory in mb
 # Formula from https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/

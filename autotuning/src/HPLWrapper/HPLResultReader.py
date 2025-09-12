@@ -48,29 +48,11 @@ def process_hpl_output(file : Path) -> pd.DataFrame:
     if is_hpl_config(file) == False:
         raise ValueError("{file} is not an HPLConfig")
     
-    results=[]
-    with file.open(mode='r', encoding='utf-8') as f:
-        data = f.readlines()
-        for i in range(len(data)):
-            curLine = data[i]
-            match = hpl_result_regex.match(curLine)
-            #print(curLine)
-            if match:
-                result = match.groupdict()
-                # convert numeric fields
-                #print(result)
-                results.append(result)
-    current_data = None
-    try:
-        current_data = pd.read_csv(csv_path)
-        current_data=pd.concat([current_data, pd.DataFrame(results)], ignore_index=True)
-    except (FileNotFoundError, pd.errors.EmptyDataError):
-        current_data=pd.DataFrame(results)
+    hpl_runs : List[HPL_Run] = get_hpl_runs(file)
+    df = pd.DataFrame([run.__dict__ for run in hpl_runs])
+
     
-    current_data["Gflops"] = current_data["Gflops"].astype(float)
-
-
-    return current_data
+    return df
 #https://github.com/learnbyexample/py_regular_expressions
 hpl_config_regex= re.compile(r"(\w+)\s*:\s*(.+)")
 
@@ -228,7 +210,6 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
     for i in range(len(results)):
         result = results[i]
         residual = residuals[i]
-        print(result)
 
         result['Gflops'] = float(result['Gflops'])
 
@@ -268,6 +249,7 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
             U=config.U_Form,
             SwapType=config.Swap_Type
         )
+        #print(f"Run {i} " + str(run))
         runs.append(run)
     return runs
     
