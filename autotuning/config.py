@@ -8,6 +8,6 @@ RESULTS_PATH= Path(__file__).parent.joinpath("results")
 
 NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 8))
 
-_availableMemory = int(os.getenv("HPL_RUNNER_MEM", "10000")) # memory in mb
+_availableMemory = int(os.getenv("HPL_RUNNER_MEM", "30000")) # memory in mb
 # Formula from https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
 MAXIMUM_HPL_N = sqrt(_availableMemory/struct.calcsize("d"))      

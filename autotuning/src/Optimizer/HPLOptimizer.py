@@ -15,7 +15,7 @@ import pandas as pd
 
 
 hpl_config_space = Space([
-    Integer(0.5*MAXIMUM_HPL_N,MAXIMUM_HPL_N*0.8, name="N"),
+    Integer(int(0.6*MAXIMUM_HPL_N),int(MAXIMUM_HPL_N*0.85), name="N"),
     Integer(1,300, name="NB"), # recommended to be 256
     Integer(0, NUM_PROCESS,name="P"),
     Integer(0, NUM_PROCESS,name="Q"),
@@ -33,7 +33,7 @@ hpl_config_space = Space([
 
 class HPLOptimizer:
     optimizer : Optimizer
-    runs_per_ask : int = 2 # how many runs per ask it should ask
+    runs_per_ask : int = 1 # how many runs per ask it should ask
     
     
     def __init__(self):
@@ -93,16 +93,19 @@ class HPLOptimizer:
         filtered_df = df[df['passed'] == True]
 
         X = filtered_df[["N","NB", "P", "Q", "PFact", "RFact", "BCast", "Nbmin", "Nbdiv", "Depth"]].values.tolist()
-
-        for r in X:
-            try:
-                transform_r = hpl_config_space.transform(r)
-            except:
-                print(r)
-                print("Failed")
         Y = (filtered_df['Gflops'].values * -1).tolist()
         self.optimizer.tell(X,Y)
 
+
+    def best_config(self) -> HPLConfig:
+        best_index = self.optimizer.yi.index(min(self.optimizer.yi))
+        best_params = self.optimizer.Xi[best_index]
+        best_value = self.optimizer.yi[best_index]
+
+        print(best_value * -1)
+        print(best_params)
+        print("Does not return yet")
+        return None
 
 
 

@@ -13,7 +13,7 @@ from HPLResultReader import is_hpl_config, get_hpl_runs, process_hpl_csv
 from HPLRunner import HPLRunner
 from config import RESULTS_PATH
 
-model_name = "test_one"
+model_name = "test_three"
 
 WRITE_FOLDER = RESULTS_PATH.joinpath(model_name)
 LOG_FOLDER = WRITE_FOLDER.joinpath("logs")
@@ -31,7 +31,7 @@ processed_files = []
 
 runner : HPLRunner
 optimizer : HPLOptimizer
-
+iterations = 100
 if __name__ == "__main__":
     print("Reading data")
 
@@ -54,31 +54,35 @@ if __name__ == "__main__":
     runner = HPLRunner()
     runner.csv_folder=DATAFRAME_FOLDER
     runner.log_folder=LOG_FOLDER
+    for i in range(iterations):
+        print("Reading through paths")
+        for path in DATAFRAME_FOLDER.iterdir():
+            if path.is_file() and (path not in processed_files):
+                if (path.suffix != ".csv"):
+                    raise ValueError(f"{path} not .csv")
+                print(f"Processing {path}" )
+                df = process_hpl_csv(path)
+                optimizer.tell_runs_dataframe(df)
+                processed_files.append(path)
+        print("Predicting config")
+        next_config : HPLConfig = optimizer.ask_next()
+        runner.setconfig(next_config)
+        print("Running config")
+        runner.runHPL()
+        print("Reading through optimized")
+        for path in DATAFRAME_FOLDER.iterdir():
+            if path.is_file() and (path not in processed_files):
+                if (path.suffix != ".csv"):
+                    raise ValueError(f"{path} not .csv")
+                df = process_hpl_csv(path)
+                optimizer.tell_runs_dataframe(df)
+                processed_files.append(path)
 
-    print("Reading through paths")
-    for path in DATAFRAME_FOLDER.iterdir():
-        if path.is_file() and (path not in processed_files):
-            if (path.suffix != ".csv"):
-                raise ValueError(f"{path} not .csv")
-            df = process_hpl_csv(path)
-            optimizer.tell_runs(df)
-            processed_files.append(path)
-    print("Predicting config")
-    next_config : HPLConfig = optimizer.ask_next()
-    runner.setconfig(next_config)
-    print("Running config")
-    #runner.runHPL()
-    print("Reading through optimized")
-    for path in DATAFRAME_FOLDER.iterdir():
-        if path.is_file() and (path not in processed_files):
-            if (path.suffix != ".csv"):
-                raise ValueError(f"{path} not .csv")
-            df = process_hpl_csv(path)
-            optimizer.tell_runs(df)
-            processed_files.append(path)
+        print("Best discovered")
+        optimizer.best_config()
 
     print("Writing model to disk")
-
+    print(len(processed_files))
     with open(optimizer_path, 'wb') as file:
         pickle.dump(optimizer, file, protocol=pickle.HIGHEST_PROTOCOL)
     with open(processed_file_path, 'w') as file:
