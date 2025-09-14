@@ -19,12 +19,7 @@ source /home/tnguyen668/software/HPL-Scripts/autotuning/.venv/bin/activate # put
 # tests
 echo $HPL_RUNNER_MEM
 counter=1
-while [ $counter -le 3 ]; do
-    echo "Counter is $counter"
-    python3 /home/tnguyen668/software/HPL-Scripts/autotuning/optimize.py
-
-    ((counter++))  # increment counter
-done
+python3 /home/tnguyen668/software/HPL-Scripts/autotuning/optimize.py
 
 
 # Please avoid using the ampersand (&) with "srun" if you intend to run processes in the background.

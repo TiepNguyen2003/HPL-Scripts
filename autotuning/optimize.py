@@ -78,17 +78,14 @@ if __name__ == "__main__":
                 optimizer.tell_runs_dataframe(df)
                 processed_files.append(path)
 
-        print("Best discovered")
-        optimizer.best_config()
-
-    print("Writing model to disk")
-    print(len(processed_files))
-    with open(optimizer_path, 'wb') as file:
-        pickle.dump(optimizer, file, protocol=pickle.HIGHEST_PROTOCOL)
-    with open(processed_file_path, 'w') as file:
-        processed_files_str = [str(p) for p in processed_files]
-        json.dump(processed_files_str, file)
-    
+        print("Writing model to disk")
+        print(len(processed_files))
+        with open(optimizer_path, 'wb') as file:
+            pickle.dump(optimizer, file, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(processed_file_path, 'w') as file:
+            processed_files_str = [str(p) for p in processed_files]
+            json.dump(processed_files_str, file)
+        
 
 
 
