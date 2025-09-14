@@ -152,6 +152,9 @@ class HPL_Run:
     U: int
     Gflops: float
 
+    residual:float
+    passed: bool
+
     def __post_init__(self):
         # auto-convert int to Enum
         if isinstance(self.BCast, int):
@@ -164,7 +167,8 @@ class HPL_Run:
             self.PMAP_Process_Mapping = PMapEnum(self.PMAP_Process_Mapping)
         if isinstance(self.SwapType, int):
             self.SwapType = SwapEnum(self.SwapType)
-        
+        if isinstance(self.passed, bool) == False:
+            raise ValueError(f"Passed {self.passed} should be a boolean")
 
         self.N = int(self.N)
         self.NB = int(self.NB)
@@ -180,4 +184,7 @@ class HPL_Run:
         self.L1 = int(self.L1)
         self.U = int(self.U)
         self.Gflops = float(self.Gflops)
+
+        self.residual = float(self.residual)
+        
         

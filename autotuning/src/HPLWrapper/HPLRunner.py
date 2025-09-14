@@ -31,18 +31,20 @@ class HPLRunner:
     numProcess : int = NUM_PROCESS
     _currentLogCount:int # the current new log
     
+    _iterator_path : Path
     
-    
-    _iterator_path = Path(RESULTS_PATH.joinpath("logs","count"))
-    log_folder : Path = RESULTS_PATH.joinpath("logs")
-    csv_folder : Path = RESULTS_PATH.joinpath("dataframes")
-    def __init__(self):
-        # detect number of available processes
-        
-        # create folders
-        RESULTS_PATH.joinpath("dataframes").mkdir(parents=True, exist_ok=True)
-        RESULTS_PATH.joinpath("logs").mkdir(parents=True, exist_ok=True)
-        # create iterator file
+    @property
+    def log_folder(self) -> Path:
+        """Getter for log_folder"""
+        return self._log_folder
+
+    @log_folder.setter
+    def log_folder(self, value: Path):
+        """Setter for log_folder"""
+        if not isinstance(value, Path):
+            raise TypeError("log_folder must be a pathlib.Path")
+        self._log_folder = value
+        self._iterator_path = self._log_folder.joinpath("count")
         try:
             with open(self._iterator_path, 'r') as file:
                 content = (file.read().strip())
@@ -51,6 +53,30 @@ class HPLRunner:
         except (FileNotFoundError, ValueError):
             self._currentLogCount = 0
 
+    @property
+    def csv_folder(self) -> Path:
+        """Getter for csv_folder"""
+        return self._csv_folder
+
+    @csv_folder.setter
+    def csv_folder(self, value: Path):
+        """Setter for csv_folder"""
+        if not isinstance(value, Path):
+            raise TypeError("csv_folder must be a pathlib.Path")
+        self._csv_folder = value
+
+
+
+    def __init__(self):
+       
+        
+        # create folders
+        RESULTS_PATH.joinpath("dataframes").mkdir(parents=True, exist_ok=True)
+        RESULTS_PATH.joinpath("logs").mkdir(parents=True, exist_ok=True)
+        
+        self._log_folder: Path = RESULTS_PATH.joinpath("logs")
+        self._csv_folder: Path = RESULTS_PATH.joinpath("dataframes")
+        self._iterator_path : Path = self.log_folder.joinpath("count")
         
 
     '''

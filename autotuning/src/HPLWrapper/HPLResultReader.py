@@ -182,8 +182,9 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
         raise ValueError("{file} is not an HPLConfig")
     config = get_hpl_config(file)
 
-    results=[]
-    residuals=[]
+    curResult = None
+    curResidual = None
+    runs = []
     with file.open(mode='r', encoding='utf-8') as f:
         data = f.readlines()
         for i in range(len(data)):
@@ -191,69 +192,81 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
             match = hpl_result_regex.match(curLine)
             #print(curLine)
             if match:
-                result = match.groupdict()
-                 # convert numeric fields
-                #print(result)
-                results.append(result)
-            elif curLine[0] == "W":
-                print(i+1)
+                if curResult is not None:
+                    raise ValueError(f"Read result at line {i+1} while previous result exists")
+                curResult = match.groupdict()
+                continue
             
             match = hpl_residual_regex.match(curLine)
             if match:
-                residual = match.groupdict()
-                residuals.append(residual)
-    
-    if (len(residuals) != len(results)):
-        raise ValueError(f"Number of residuals: {len(residuals)} does not match number of results: {len(results)}")
+                curResidual = match.groupdict()
+                if curResult is None:
+                    raise ValueError(f"Read residual at line {i+1} without previous match")
+                curResult['Gflops'] = float(curResult['Gflops'])
 
-    runs = []
-    for i in range(len(results)):
-        result = results[i]
-        residual = residuals[i]
+                if "L" in str(curResult['cpfact']):
+                    curResult['cpfact'] = PFactEnum.Left
+                elif "R" in str(curResult['cpfact']):
+                    curResult['cpfact'] = PFactEnum.Right
+                elif "C" in str(curResult['cpfact']):
+                    curResult['cpfact'] = PFactEnum.Crout
 
-        result['Gflops'] = float(result['Gflops'])
+                if "L" in str(curResult['crfact']):
+                    curResult['crfact'] = RFactEnum.Left
+                elif "R" in str(curResult['crfact']):
+                    curResult['crfact'] = RFactEnum.Right
+                elif "C" in str(curResult['crfact']):
+                    curResult['crfact'] = RFactEnum.Crout
 
-        if "L" in str(result['cpfact']):
-            result['cpfact'] = PFactEnum.Left
-        elif "R" in str(result['cpfact']):
-            result['cpfact'] = PFactEnum.Right
-        elif "C" in str(result['cpfact']):
-            result['cpfact'] = PFactEnum.Crout
+                curResidual['residual'] = float(curResidual['residual'])
+                curResidual['status'] = True if "PASSED" in str(curResidual) else False
+                run = HPL_Run(
+                    source_file = str(file),
+                    N=curResult['N'],
+                    NB=curResult['NB'],
+                    PMAP_Process_Mapping=config.PMAP_Process_Mapping,
+                    P=curResult['nprow'],
+                    Q=curResult['npcol'],
+                    Threshold= config.Threshold,
+                    Equilibration_Enabled=config.Equilibration_Enabled,
+                    BCast=int(curResult['ctop']), # ctop  
+                    PFact=curResult['cpfact'], # cpfact
+                    RFact=curResult['crfact'], # crfact
+                    Nbdiv=curResult['nbdiv'], 
+                    Nbmin=curResult['nbmin'],
+                    Depth=curResult['depth'],
+                    wTime=curResult['wtime'],
+                    Gflops=curResult['Gflops'],
+                    Align=config.MemoryAlignment,
+                    L1=config.L1_Form,
+                    U=config.U_Form,
+                    SwapType=config.Swap_Type,
+                    residual=curResidual['residual'],
+                    passed=curResidual['status']
 
-        if "L" in str(result['crfact']):
-            result['crfact'] = RFactEnum.Left
-        elif "R" in str(result['crfact']):
-            result['crfact'] = RFactEnum.Right
-        elif "C" in str(result['crfact']):
-            result['crfact'] = RFactEnum.Crout
+                )
+                #print(f"Run {i} " + str(run))
+                runs.append(run)
 
-        run = HPL_Run(
-            source_file = str(file),
-            N=result['N'],
-            NB=result['NB'],
-            PMAP_Process_Mapping=config.PMAP_Process_Mapping,
-            P=result['nprow'],
-            Q=result['npcol'],
-            Threshold= config.Threshold,
-            Equilibration_Enabled=config.Equilibration_Enabled,
-            BCast=int(result['ctop']), # ctop  
-            PFact=result['cpfact'], # cpfact
-            RFact=result['crfact'], # crfact
-            Nbdiv=result['nbdiv'], 
-            Nbmin=result['nbmin'],
-            Depth=result['depth'],
-            wTime=result['wtime'],
-            Gflops=result['Gflops'],
-            Align=config.MemoryAlignment,
-            L1=config.L1_Form,
-            U=config.U_Form,
-            SwapType=config.Swap_Type
-        )
-        #print(f"Run {i} " + str(run))
-        runs.append(run)
+                curResidual = None
+                curResult = None
     return runs
     
 
+def process_hpl_csv(path : Path) -> pd.DataFrame:
+    df = pd.read_csv(path)
+
+    # Check dataframe
+    # TODO, implement dataframe check
+    #
+
+    df['PMAP_Process_Mapping']= df['PMAP_Process_Mapping'].map(lambda c: PMapEnum[c.split(".")[1]])
+    df['BCast'] = df['BCast'].map(lambda c: BCastEnum[c.split(".")[1]])
+    df['PFact'] = df['PFact'].map(lambda c: PFactEnum[c.split(".")[1]])
+    df['RFact'] = df['RFact'].map(lambda c: RFactEnum[c.split(".")[1]])
+    df['SwapType'] = df['SwapType'].map(lambda c: SwapEnum[c.split(".")[1]])
+
+    return df
 
 
     

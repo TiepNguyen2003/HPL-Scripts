@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 sys.path.append(str(Path(__file__).parent.parent.joinpath("src/HPLWrapper").resolve()))
 
-from HPLResultReader import process_hpl_output, get_hpl_config, get_hpl_runs
+from HPLResultReader import process_hpl_output, get_hpl_config, get_hpl_runs,process_hpl_csv
 from HPLConfig import HPLConfig, HPL_Run, PFactEnum, RFactEnum, BCastEnum, PMapEnum
 TEST_SAMPLES_FOLDER = Path(__file__).parent.joinpath("test_samples")
 
@@ -44,12 +44,16 @@ inputs = [
 
 @pytest.mark.parametrize("file_path,sample_config", inputs)
 def test_process_hpl_output(file_path,sample_config):
+    if (file_path.suffix != ".log"):
+        pytest.skip()
     dataframe : pd.DataFrame = process_hpl_output(file_path)
     assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
     assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
 
 @pytest.mark.parametrize("file_path,sample_config", inputs)
 def test_get_hpl_config(file_path,sample_config):
+    if (file_path.suffix != ".log"):
+        pytest.skip()
     # Test the get_hpl_config function
 
     config : HPLConfig = get_hpl_config(file_path)
@@ -61,6 +65,8 @@ def test_get_hpl_config(file_path,sample_config):
     pass 
 @pytest.mark.parametrize("file_path,sample_config", inputs)
 def test_get_hpl_runs(file_path,sample_config):
+    if (file_path.suffix != ".log"):
+        pytest.skip()
     hplruns = get_hpl_runs(file_path)
 
     for run in hplruns:
@@ -76,3 +82,13 @@ def test_get_hpl_runs(file_path,sample_config):
     assert df['BCast'].dtype == BCastEnum, "BCast column is not BCastEnum"
     print(df)
     df.to_csv(Path(__file__).parent.joinpath(f"test_results/{file_path.name} hpl_runs.csv"), index=False)
+
+def test_get_dataframe_csv():
+    
+    hplruns = process_hpl_csv(TEST_SAMPLES_FOLDER.joinpath("hpl_output.csv"))
+
+
+    assert hplruns['Gflops'].dtype == float, "Gflops column is not float"
+    assert hplruns['PFact'].dtype == PFactEnum, "PFact column is not PFactEnum"
+    assert hplruns['RFact'].dtype == RFactEnum, "RFact column is not RFactEnum"
+    assert hplruns['BCast'].dtype == BCastEnum, "BCast column is not BCastEnum"

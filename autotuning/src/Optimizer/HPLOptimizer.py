@@ -10,7 +10,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent.resolve()))
 from config import MAXIMUM_HPL_N, NUM_PROCESS
 from HPLConfig import HPLConfig, HPL_Run, PMapEnum, BCastEnum, PFactEnum, RFactEnum
 from typing import List
-
+import pandas as pd
 
 
 
@@ -24,7 +24,7 @@ hpl_config_space = Space([
     Categorical(list(RFactEnum), name="RFact"),
     Categorical(list(BCastEnum), name="BCast"),
     Integer(1, 20, name="NBMin"),
-    Integer(2, 20, name = "NDiv"),
+    Integer(2, 20, name = "NbDiv"),
     Integer(0, 5, name="Depth"),
     #Categorical([0,1], name="L1"),
     #Categorical([0,1], name="U"),
@@ -45,22 +45,23 @@ class HPLOptimizer:
             n_initial_points=10,
             random_state=42
         )
+    def get_run_count(self):
+        return len(self.optimizer.Xi)
+
     def tell_run(self, run : HPL_Run):
         #TODO, add flexibility so that variables can easily be removed from space
         x = [run.N, 
-             run.NB, 
-             run.P, 
-             run.Q,
-             run.PFact,
-             run.RFact,
-             run.BCast,
-             run.Nbmin,
-             run.Nbdiv,
-             run.Depth
-             ]
+            run.NB, 
+            run.P, 
+            run.Q,
+            run.PFact,
+            run.RFact,
+            run.BCast,
+            run.Nbmin,
+            run.Nbdiv,
+            run.Depth
+            ]
         self.optimizer.tell(x, run.Gflops)
-    def get_run_count(self):
-        return len(self.optimizer.Xi)
 
     def tell_runs(self, runs : List[HPL_Run]):
         #TODO, add flexibility so that variables can easily be removed from space
@@ -72,8 +73,40 @@ class HPLOptimizer:
         
         self.optimizer.tell(x, gflops)
     
-    def ask_next(self) -> HPLConfig:
+    def tell_runs_dataframe(self, df : pd.DataFrame):
+        required_columns = {'N',
+                            'NB',
+                            'P',
+                            'Q',
+                            'BCast',
+                            'PFact',
+                            'RFact',
+                            'Nbmin',
+                            'Nbdiv',
+                            'Depth',
+                            'Gflops',
+                            'passed'}
         
+        if required_columns.issubset(df.columns) == False:
+            raise ValueError("DF does not contain columns")
+        
+        filtered_df = df[df['passed'] == True]
+
+        X = filtered_df[["N","NB", "P", "Q", "PFact", "RFact", "BCast", "Nbmin", "Nbdiv", "Depth"]].values.tolist()
+
+        for r in X:
+            try:
+                transform_r = hpl_config_space.transform(r)
+            except:
+                print(r)
+                print("Failed")
+        Y = (filtered_df['Gflops'].values * -1).tolist()
+        self.optimizer.tell(X,Y)
+
+
+
+
+    def ask_next(self) -> HPLConfig:        
         '''
         hpl_config = HPLConfig(
             N_Array=[param_dict['N']],
@@ -126,7 +159,7 @@ class HPLOptimizer:
             _RFact_Array.add(param_dict['RFact'])
             _Depth_Array.append(param_dict['Depth'])
             _NBMin_Array.append(param_dict['NBMin'])
-            _NDIV_Array.append(param_dict['NDiv'])
+            _NDIV_Array.append(param_dict['NbDiv'])
             _BCAST_Array.add(param_dict['BCast'])
         hpl_config = HPLConfig(
             N_Array=_N_Array,
