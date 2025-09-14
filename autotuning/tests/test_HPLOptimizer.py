@@ -50,7 +50,7 @@ def test_tell_runs():
     hpl_optimizer.tell_runs(run_list)
     
 def test_tell_dataframe():
-    df = pd.read_csv(TEST_SAMPLES_FOLDER.joinpath('hpl_output.csv'))
+    df = process_hpl_csv(TEST_SAMPLES_FOLDER.joinpath('hpl_output.csv'))
 
     hpl_optimizer.tell_runs_dataframe(df)
 
