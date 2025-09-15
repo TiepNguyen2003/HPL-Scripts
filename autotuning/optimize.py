@@ -11,9 +11,9 @@ from HPLOptimizer import HPLOptimizer
 from HPLConfig import HPLConfig
 from HPLResultReader import is_hpl_config, get_hpl_runs, process_hpl_csv
 from HPLRunner import HPLRunner
-from config import RESULTS_PATH
+from config import RESULTS_PATH, MAXIMUM_HPL_N
 
-model_name = "test_three"
+model_name = "train_2"
 
 WRITE_FOLDER = RESULTS_PATH.joinpath(model_name)
 LOG_FOLDER = WRITE_FOLDER.joinpath("logs")
@@ -31,11 +31,11 @@ processed_files = []
 
 runner : HPLRunner
 optimizer : HPLOptimizer
-iterations = 100
+iterations = 1
 if __name__ == "__main__":
     print("Reading data")
-
-
+    print(f"bounds are {int(0.6*MAXIMUM_HPL_N)}  {int(MAXIMUM_HPL_N*0.85)}")
+    
     try:
         with open(optimizer_path, 'rb') as file:
             optimizer=pickle.load(file)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
             processed_files = [Path(p) for p in processed_files_str] 
     except FileNotFoundError:
         processed_files=[]
-   
+    print(optimizer.optimizer.space)
     print("Creating runner")
     runner = HPLRunner()
     runner.csv_folder=DATAFRAME_FOLDER

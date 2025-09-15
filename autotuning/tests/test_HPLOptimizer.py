@@ -9,7 +9,7 @@ from skopt.space import Real, Integer, Categorical, Space
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("src/HPLWrapper").resolve()))
 
-from HPLResultReader import process_hpl_output, get_hpl_config, get_hpl_runs
+from HPLResultReader import process_hpl_output, get_hpl_config, get_hpl_runs,process_hpl_csv
 from HPLConfig import HPLConfig, HPL_Run, PFactEnum, RFactEnum, BCastEnum, PMapEnum
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("src/Optimizer").resolve()))
@@ -38,7 +38,7 @@ test_space = Space([
 
 
 hpl_optimizer = HPLOptimizer()
-hpl_optimizer.optimizer.space = test_space
+#hpl_optimizer.optimizer.space = test_space
 
 def test_tell_run():
     run_list : List[HPL_Run]  = get_hpl_runs(HPL_OUTPUT_FILE)
@@ -52,12 +52,17 @@ def test_tell_runs():
 def test_tell_dataframe():
     df = process_hpl_csv(TEST_SAMPLES_FOLDER.joinpath('hpl_output.csv'))
 
+    #hpl_optimizer.optimizer.space = test_space
     hpl_optimizer.tell_runs_dataframe(df)
 
-
 def test_ask():
+    config = hpl_optimizer.ask_next()
+    print(config)
+
+def test_ask_learn():
     config1 = hpl_optimizer.ask_next()
-    test_tell_run()
+    run_list : List[HPL_Run]  = get_hpl_runs(HPL_OUTPUT_FILE)
+    hpl_optimizer.tell_runs(run_list)
     config2 = hpl_optimizer.ask_next()
     assert isinstance(config1, HPLConfig), "Config not HPLConfig"
     assert config1.isValid() == True, "Config is not valid"

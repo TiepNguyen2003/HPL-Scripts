@@ -56,7 +56,7 @@ def test_setconfig():
 
 def test_runHPL():
     runner = HPLRunner()
-    runner.setconfig(config2)
+    runner.setconfig(config1)
     dataframe: pd.DataFrame = runner.runHPL()
 
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
@@ -65,7 +65,7 @@ def test_runHPL():
 
 def test_runHPL_2():
     runner = HPLRunner()
-    runner.setconfig(config)
+    runner.setconfig(config2)
     dataframe: pd.DataFrame = runner.runHPL()
 
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)

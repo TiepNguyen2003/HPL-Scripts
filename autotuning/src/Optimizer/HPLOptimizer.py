@@ -13,32 +13,31 @@ from typing import List
 import pandas as pd
 
 
-
-hpl_config_space = Space([
-    Integer(int(0.6*MAXIMUM_HPL_N),int(MAXIMUM_HPL_N*0.85), name="N"),
-    Integer(1,300, name="NB"), # recommended to be 256
-    Integer(0, NUM_PROCESS,name="P"),
-    Integer(0, NUM_PROCESS,name="Q"),
-    #Categorical(list(PMapEnum), name="PMap"),
-    Categorical(list(PFactEnum), name="PFact"),
-    Categorical(list(RFactEnum), name="RFact"),
-    Categorical(list(BCastEnum), name="BCast"),
-    Integer(1, 20, name="NBMin"),
-    Integer(2, 20, name = "NbDiv"),
-    Integer(0, 5, name="Depth"),
-    #Categorical([0,1], name="L1"),
-    #Categorical([0,1], name="U"),
-    #Categorical([0,1], name="Equilibration_Enabled")
-])
-
 class HPLOptimizer:
     optimizer : Optimizer
     runs_per_ask : int = 1 # how many runs per ask it should ask
     
-    
+    hpl_config_space = Space([
+        Integer(int(0.6*MAXIMUM_HPL_N),int(MAXIMUM_HPL_N*0.85), name="N"),
+        Integer(1,300, name="NB"), # recommended to be 256
+        Integer(0, NUM_PROCESS,name="P"),
+        Integer(0, NUM_PROCESS,name="Q"),
+        #Categorical(list(PMapEnum), name="PMap"),
+        Categorical(list(PFactEnum), name="PFact"),
+        Categorical(list(RFactEnum), name="RFact"),
+        Categorical(list(BCastEnum), name="BCast"),
+        Integer(1, 20, name="NBMin"),
+        Integer(2, 20, name = "NbDiv"),
+        Integer(0, 5, name="Depth"),
+        #Categorical([0,1], name="L1"),
+        #Categorical([0,1], name="U"),
+        #Categorical([0,1], name="Equilibration_Enabled")
+    ])
+
+
     def __init__(self):
         self.optimizer = Optimizer(
-            dimensions=hpl_config_space.dimensions,
+            dimensions=self.hpl_config_space.dimensions,
             base_estimator="GP",
             acq_func="LCB",
             acq_optimizer="auto",
@@ -169,9 +168,9 @@ class HPLOptimizer:
             NB_Array=_NB_Array,
             P_Array=_P_Array,
             Q_Array=_Q_Array,
-            PFact_Array=_PFact_Array,
-            RFact_Array=_RFact_Array,
-            BCAST_Array=_BCAST_Array,
+            PFact_Array=list(PFactEnum),
+            RFact_Array=list(RFactEnum),
+            BCAST_Array=list(BCastEnum),
             Depth_Array=_Depth_Array,
             NBMin_Array=_NBMin_Array,
             NDIV_Array=_NDIV_Array,

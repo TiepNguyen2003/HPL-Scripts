@@ -73,10 +73,9 @@ class HPLRunner:
         # create folders
         RESULTS_PATH.joinpath("dataframes").mkdir(parents=True, exist_ok=True)
         RESULTS_PATH.joinpath("logs").mkdir(parents=True, exist_ok=True)
-        
-        self._log_folder: Path = RESULTS_PATH.joinpath("logs")
-        self._csv_folder: Path = RESULTS_PATH.joinpath("dataframes")
-        self._iterator_path : Path = self.log_folder.joinpath("count")
+         
+        self.log_folder = RESULTS_PATH.joinpath("logs")
+        self.csv_folder = RESULTS_PATH.joinpath("dataframes")
         
 
     '''
@@ -100,7 +99,14 @@ class HPLRunner:
             for q in self.config.Q_Array:
                 if p * q > self.numProcess:
                     print(f"Warning, Process grid {p}x{q} exceeds available processes {self.numProcess}")
-                    
+
+        
+        with open(self._iterator_path, 'rw') as file:
+
+            content = (file.read().strip())
+            self._currentLogCount = int(content)
+            self._currentLogCount+=1
+            file.write(str(self._currentLogCount))     
         # Run HPL
         result_content = subprocess.run(
             ['mpirun', '-np', str(self.numProcess), './xhpl'], stdout=subprocess.PIPE,
@@ -118,9 +124,6 @@ class HPLRunner:
         print(result_content.stderr)
         with open(result_path, 'w') as file:
             file.write(result_content.stdout)
-            self._currentLogCount+=1
-        with open(self._iterator_path, 'w') as file:
-            file.write(str(self._currentLogCount))
 
         dataframe : pd.DataFrame = process_hpl_output(Path(result_path))
 
