@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 print(Path(__file__).parent.parent.parent.resolve())
 sys.path.append(str(Path(__file__).parent.parent.parent.resolve()))
-from config import HPL_EXEC_FOLDER_PATH, RESULTS_PATH, NUM_PROCESS
+from config import HPL_EXEC_FOLDER_PATH, RESULTS_PATH, NUM_PROCESS, MAXIMUM_HPL_N
 
 import tempfile
 from logging import config
@@ -85,14 +85,12 @@ class HPLRunner:
     def runHPL(self) -> Optional[pd.DataFrame]:
         # Sanity Checks (Ensures the partition is runnable)
 
-        currentAvailMemory = int(os.getenv("HPL_RUNNER_MEM", psutil.virtual_memory().available))
-        print(currentAvailMemory)
         for n in self.config.N_Array:
             if n <= 0:
                 print(f"Invalid problem size: {n}")
                 return None
             
-            if (n^2 * struct.calcsize("d") > currentAvailMemory):
+            if (n > MAXIMUM_HPL_N):
                 print(f"Problem size too large!")
                 return None
         for p in self.config.P_Array:
@@ -101,10 +99,14 @@ class HPLRunner:
                     print(f"Warning, Process grid {p}x{q} exceeds available processes {self.numProcess}")
 
         
-        with open(self._iterator_path, 'rw') as file:
+        try:
+            with open(self._iterator_path, 'r') as file:
+                content = (file.read().strip())
+                self._currentLogCount = int(content)
+        except (FileNotFoundError, ValueError):
+            self._currentLogCount = 0
 
-            content = (file.read().strip())
-            self._currentLogCount = int(content)
+        with open(self._iterator_path, 'w') as file:
             self._currentLogCount+=1
             file.write(str(self._currentLogCount))     
         # Run HPL

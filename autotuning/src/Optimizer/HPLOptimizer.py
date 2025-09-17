@@ -18,7 +18,7 @@ class HPLOptimizer:
     runs_per_ask : int = 1 # how many runs per ask it should ask
     
     hpl_config_space = Space([
-        Integer(int(0.6*MAXIMUM_HPL_N),int(MAXIMUM_HPL_N*0.85), name="N"),
+        Integer(int(0.2*MAXIMUM_HPL_N),int(MAXIMUM_HPL_N*0.85), name="N"),
         Integer(1,300, name="NB"), # recommended to be 256
         Integer(0, NUM_PROCESS,name="P"),
         Integer(0, NUM_PROCESS,name="Q"),
@@ -142,7 +142,7 @@ class HPLOptimizer:
         for i in range(self.runs_per_ask):
             x = self.optimizer.ask()
             # convert x to a dictionary
-            param_dict = {dim.name: val for dim, val in zip(hpl_config_space.dimensions, x)}
+            param_dict = {dim.name: val for dim, val in zip(self.hpl_config_space.dimensions, x)}
 
             if (param_dict['P'] == 0):
                 param_dict['P'] = 1

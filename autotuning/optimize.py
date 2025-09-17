@@ -11,9 +11,9 @@ from HPLOptimizer import HPLOptimizer
 from HPLConfig import HPLConfig
 from HPLResultReader import is_hpl_config, get_hpl_runs, process_hpl_csv
 from HPLRunner import HPLRunner
-from config import RESULTS_PATH, MAXIMUM_HPL_N
+from config import RESULTS_PATH, MAXIMUM_HPL_N, NUM_PROCESS, _availableMemory
 
-model_name = "train_2"
+model_name = "train_4"
 
 WRITE_FOLDER = RESULTS_PATH.joinpath(model_name)
 LOG_FOLDER = WRITE_FOLDER.joinpath("logs")
@@ -33,9 +33,10 @@ runner : HPLRunner
 optimizer : HPLOptimizer
 iterations = 1
 if __name__ == "__main__":
-    print("Reading data")
-    print(f"bounds are {int(0.6*MAXIMUM_HPL_N)}  {int(MAXIMUM_HPL_N*0.85)}")
-    
+    print("Reading data") 
+    print(f"Memory MB {_availableMemory}")
+    print(f"bounds are {int(0.2*MAXIMUM_HPL_N)}  {int(MAXIMUM_HPL_N*0.85)}")
+    print(f"Numprocess {NUM_PROCESS}")
     try:
         with open(optimizer_path, 'rb') as file:
             optimizer=pickle.load(file)
@@ -54,7 +55,8 @@ if __name__ == "__main__":
     runner = HPLRunner()
     runner.csv_folder=DATAFRAME_FOLDER
     runner.log_folder=LOG_FOLDER
-    for i in range(iterations):
+
+    for i in range(iterations): 
         print("Reading through paths")
         for path in DATAFRAME_FOLDER.iterdir():
             if path.is_file() and (path not in processed_files):
@@ -64,12 +66,15 @@ if __name__ == "__main__":
                 df = process_hpl_csv(path)
                 optimizer.tell_runs_dataframe(df)
                 processed_files.append(path)
+
         print("Predicting config")
         next_config : HPLConfig = optimizer.ask_next()
         runner.setconfig(next_config)
+
         print("Running config")
         runner.runHPL()
-        print("Reading through optimized")
+
+        print("Reading through dataframe foldier again")
         for path in DATAFRAME_FOLDER.iterdir():
             if path.is_file() and (path not in processed_files):
                 if (path.suffix != ".csv"):

@@ -1,24 +1,27 @@
 #!/bin/bash
 #SBATCH --nodes=1    # request only 1 node
-#SBATCH --partition short      # this job will be submitted to test queue
-#SBATCH --mem=32GB #this job is asked for 96G of total memory, use 0 if you want to use entire node memory
+#SBATCH --partition short      # this job will be submitted to short queue queue
+
+#SBATCH --mem=256000MB #this job is asked for 96G of total memory, use 0 if you want to use entire node memory
 #SBATCH --time=0-05:55:00 # 
-#SBATCH --ntasks-per-node=36 # 
-#SBATCH --output=/home/tnguyen668/software/HPL-Scripts/autotuning/results/hpl_result.out    # standard output will be redirected to this file
+#SBATCH --ntasks=56
+#SBATCH --ntasks-per-core=1
+#SBATCH --output=/home/tnguyen668/software/HPL-Scripts/autotuning/results/hpl_result.%x.%j.out    # standard output will be redirected to this file
 #SBATCH --job-name=hpl_autotuning_train    # this is your job’s name
 #SBATCH --mail-user=tnguyen668@ucmerced.edu
 #SBATCH --mail-type=ALL  #uncomment the first two lines if you want to receive     the email notifications
 #SBATCH --export=ALL
-
-set HPL_RUNNER_MEM=32000
-set HPL_NUM_PROCESS=32
+##SBATCH --constraint="sapphire-rapids"
 
 source /home/tnguyen668/software/HPL-Scripts/cluster/setpath.sh
 source /home/tnguyen668/software/HPL-Scripts/autotuning/.venv/bin/activate # put your virtual environment here
 
+
+export HPL_RUNNER_MEM=256000
+export HPL_NUM_PROCESS=56
+
 # tests
-echo $HPL_RUNNER_MEM
-counter=1
+
 python3 /home/tnguyen668/software/HPL-Scripts/autotuning/optimize.py
 
 
