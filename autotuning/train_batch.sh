@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --nodes=1    # request only 1 node
-#SBATCH --partition short      # this job will be submitted to short queue queue
+#SBATCH --partition medium      # this job will be submitted to short queue queue
 
 #SBATCH --mem=256000MB #this job is asked for 96G of total memory, use 0 if you want to use entire node memory
-#SBATCH --time=0-05:55:00 # 
+#SBATCH --time=0-20:00:00 # 
 #SBATCH --ntasks=56
 #SBATCH --ntasks-per-core=1
 #SBATCH --output=/home/tnguyen668/software/HPL-Scripts/autotuning/results/hpl_result.%x.%j.out    # standard output will be redirected to this file

@@ -1,4 +1,15 @@
 #!/bin/bash
+#SBATCH --nodes=1    # request only 1 node
+#SBATCH --partition medium      # this job will be submitted to short queue queue
+#SBATCH --mem=256000MB #this job is asked for 96G of total memory, use 0 if you want to use entire node memory
+#SBATCH --time=0-20:00:00 # 
+#SBATCH --ntasks=56
+#SBATCH --ntasks-per-core=1
+#SBATCH --output=/home/tnguyen668/software/HPL-Scripts/cluster/outputs/hpl_result.%x.%j.out    # standard output will be redirected to this file
+#SBATCH --job-name=hpl_run    # this is your job’s name
+#SBATCH --mail-user=tnguyen668@ucmerced.edu
+#SBATCH --mail-type=ALL  #uncomment the first two lines if you want to receive     the email notifications
+#SBATCH --export=ALL
 #https://www.netlib.org/benchmark/hpl/tuning.html
 #https://www.mgaillard.fr/2022/08/27/benchmark-with-hpl.html
 
@@ -6,35 +17,36 @@
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 HPL_TEMPLATE_PATH=$Script_Dir/templates/hpl_template.dat
-HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine/HPL.dat
+HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/pinnacles/HPL.dat
 XHPL_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/xhpl
-XHPL_FOLDER=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine
+XHPL_FOLDER=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/pinnacles
+
 source "$Script_Dir/setpath.sh"
 
 # default values 
 OUTPUT_NAME=output.log # output file name (if any)
 DEVICE_OUT=6         #  device out (6=stdout,7=stderr,file)
-PROBLEM_SIZE=4            # of problems sizes (N)
-N_ARRAY="29 30 34 35"
+PROBLEM_SIZE=1            # of problems sizes (N)
+N_ARRAY= "178885"
 NB_COUNT=4    
-NB_ARRAY="1 2 3 4"    
+NB_ARRAY="40 120 200 280"    
 PMAP_MAPPING=0     
 N_PROCESS_GRID=1  # Number of process grids (P x Q)   
-P_ARRAY="1"    
-Q_ARRAY="1"       
+P_ARRAY="8"    
+Q_ARRAY="7"       
 THRESHOLD=16.0 # double       
-N_PFACT=3        
-PFACT_ARRAY="0 1 2"       
+N_PFACT=1        
+PFACT_ARRAY="1"       
 N_RECURSIVE_CRIT=2       
-NBMIN_ARRAY="2 4"         
+NBMIN_ARRAY="4 8"         
 N_PANEL_RECUR=1           
 NDIVS=2           
-N_RFACTS=3      
-RFACT_ARRAY="0 1 2"  #0=left, 1=Crout, 2=Right
+N_RFACTS=1      
+RFACT_ARRAY="2"  #0=left, 1=Crout, 2=Right
 BCASTS=6 #
 BCAST_ARRAY="0 1 2 3 4 5" #  0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM   
-LOOKAHEAD_DEPTH=1  
-N_DEPTHS=0           
+LOOKAHEAD_DEPTH=2  
+N_DEPTHS="0 1"          
 SWAP_TYPE=2 #   (0=bin-exch,1=long,2=mix)        
 SWAP_THRESHOLD=64   
 L1_FORM=0   
@@ -78,4 +90,4 @@ sed -e 's%@OUTPUT_NAME@%'"$OUTPUT_NAME"'%' \
     "$HPL_TEMPLATE_PATH" > "$HPL_DAT_PATH"
 
 cd $XHPL_FOLDER
-./xhpl
+mpirun -np 56 ./xhpl > "$Script_Dir/outputs/output.log"
