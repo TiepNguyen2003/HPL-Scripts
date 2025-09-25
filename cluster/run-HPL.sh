@@ -14,7 +14,7 @@
 #https://www.mgaillard.fr/2022/08/27/benchmark-with-hpl.html
 
 
-Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+Script_Dir="/home/tnguyen668/software/HPL-Scripts/cluster"
 
 HPL_TEMPLATE_PATH=$Script_Dir/templates/hpl_template.dat
 HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/pinnacles/HPL.dat
@@ -27,7 +27,7 @@ source "$Script_Dir/setpath.sh"
 OUTPUT_NAME=output.log # output file name (if any)
 DEVICE_OUT=6         #  device out (6=stdout,7=stderr,file)
 PROBLEM_SIZE=1            # of problems sizes (N)
-N_ARRAY= "178885"
+N_ARRAY="178885"
 NB_COUNT=4    
 NB_ARRAY="40 120 200 280"    
 PMAP_MAPPING=0     
@@ -89,5 +89,4 @@ sed -e 's%@OUTPUT_NAME@%'"$OUTPUT_NAME"'%' \
     -e 's%@MEM_ALIGN_DBL@%'"$MEM_ALIGN_DBL"'%' \
     "$HPL_TEMPLATE_PATH" > "$HPL_DAT_PATH"
 
-cd $XHPL_FOLDER
-mpirun -np 56 ./xhpl > "$Script_Dir/outputs/output.log"
+mpirun -np 56 $XHPL_PATH > "$Script_Dir/outputs/output.log"
