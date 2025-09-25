@@ -23,7 +23,7 @@ test_space = Space([
     Integer(1,2000000, name="N"),
     Integer(1,300, name="NB"), # recommended to be 256
     Integer(0, 16,name="P"),
-    Integer(0, 16,name="Q"),
+    #Integer(0, 16,name="Q"),
     #Categorical(list(PMapEnum), name="PMap"),
     Categorical(list(PFactEnum), name="PFact"),
     Categorical(list(RFactEnum), name="RFact"),
@@ -38,7 +38,7 @@ test_space = Space([
 
 
 hpl_optimizer = HPLOptimizer()
-#hpl_optimizer.optimizer.space = test_space
+hpl_optimizer.optimizer.space = test_space
 
 def test_tell_run():
     run_list : List[HPL_Run]  = get_hpl_runs(HPL_OUTPUT_FILE)
@@ -52,7 +52,6 @@ def test_tell_runs():
 def test_tell_dataframe():
     df = process_hpl_csv(TEST_SAMPLES_FOLDER.joinpath('hpl_output.csv'))
 
-    #hpl_optimizer.optimizer.space = test_space
     hpl_optimizer.tell_runs_dataframe(df)
 
 def test_ask():

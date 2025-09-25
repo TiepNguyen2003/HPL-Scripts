@@ -17,9 +17,9 @@
 Script_Dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 HPL_TEMPLATE_PATH=$Script_Dir/templates/hpl_template.dat
-HPL_DAT_PATH=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/pinnacles/HPL.dat
-XHPL_PATH=/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles/xhpl
-XHPL_FOLDER=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/pinnacles
+XHPL_FOLDER=/home/tiep_nguyen/HPL-Folder/hpl-2.3/bin/local_machine
+XHPL_PATH="$XHPL_FOLDER/xhpl"
+HPL_DAT_PATH="$XHPL_FOLDER/HPL.dat"
 
 source "$Script_Dir/setpath.sh"
 
@@ -27,13 +27,13 @@ source "$Script_Dir/setpath.sh"
 OUTPUT_NAME=output.log # output file name (if any)
 DEVICE_OUT=6         #  device out (6=stdout,7=stderr,file)
 PROBLEM_SIZE=1            # of problems sizes (N)
-N_ARRAY= "178885"
+N_ARRAY="32050"
 NB_COUNT=4    
 NB_ARRAY="40 120 200 280"    
 PMAP_MAPPING=0     
 N_PROCESS_GRID=1  # Number of process grids (P x Q)   
-P_ARRAY="8"    
-Q_ARRAY="7"       
+P_ARRAY="4"    
+Q_ARRAY="2"       
 THRESHOLD=16.0 # double       
 N_PFACT=1        
 PFACT_ARRAY="1"       
@@ -43,8 +43,8 @@ N_PANEL_RECUR=1
 NDIVS=2           
 N_RFACTS=1      
 RFACT_ARRAY="2"  #0=left, 1=Crout, 2=Right
-BCASTS=6 #
-BCAST_ARRAY="0 1 2 3 4 5" #  0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM   
+BCASTS=2 #
+BCAST_ARRAY="1 3" #  0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM   
 LOOKAHEAD_DEPTH=2  
 N_DEPTHS="0 1"          
 SWAP_TYPE=2 #   (0=bin-exch,1=long,2=mix)        
@@ -90,4 +90,4 @@ sed -e 's%@OUTPUT_NAME@%'"$OUTPUT_NAME"'%' \
     "$HPL_TEMPLATE_PATH" > "$HPL_DAT_PATH"
 
 cd $XHPL_FOLDER
-mpirun -np 56 ./xhpl > "$Script_Dir/outputs/output.log"
+mpirun -np 8  --use-hwthread-cpus ./xhpl > "$Script_Dir/outputs/output.log"

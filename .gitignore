@@ -5,3 +5,5 @@
 **/cache/
 autotuning/src/Optimizer/cache/filesread.json
 autotuning/src/Optimizer/cache/optimizer.pk1
+autotuning/.env
+**/outputs/
