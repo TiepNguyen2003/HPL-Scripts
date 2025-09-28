@@ -17,8 +17,10 @@ _availableMemory = int(os.getenv("HPL_RUNNER_MEM", "30000")) # memory in mb
 # Formula from https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
 
 MAXIMUM_HPL_N = int(sqrt(_availableMemory*1000000/struct.calcsize("d")))      
-MIN_SPACE_N = os.getenv("HPL_MIN_SPACE_N",int(MAXIMUM_HPL_N * 0.65))
-MAX_SPACE_N = os.getenv("HPL_MAX_SPACE_N",int(MAXIMUM_HPL_N * 0.95))
+MIN_SPACE_N = int(os.getenv("HPL_MIN_SPACE_N",MAXIMUM_HPL_N * 0.25))
+MAX_SPACE_N = int(os.getenv("HPL_MAX_SPACE_N",MAXIMUM_HPL_N * 0.95))
 
-RANK = int(os.getenv("SLURM_ARRAY_TASK_ID",1)) - 1 # we subtract by one bc task id starts at 1
-NUM_NODES = int(os.getenv("SLURM_ARRAY_TASK_COUNT",4))
+JOB_NAME = str(os.getenv("HPL_JOB_NAME", "hpl_autotuning_train"))
+
+RANK = int(os.getenv("HPL_RANK",1)) - 1 # we subtract by one bc task id starts at 1
+NUM_NODES = int(os.getenv("HPL_NUM_NODES",4))

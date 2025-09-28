@@ -222,7 +222,7 @@ class HPLRunner:
             filecontent = filecontent.replace("@NB_COUNT@", str(len(config.NB_Array)))
             filecontent = filecontent.replace("@NB_ARRAY@", self._list_to_string(config.NB_Array))
 
-            filecontent = filecontent.replace("@PMAP_MAPPING@", str(config.PMAP_Process_Mapping))
+            filecontent = filecontent.replace("@PMAP_MAPPING@", str(config.PMAP_Process_Mapping.value))
             filecontent = filecontent.replace("@N_PROCESS_GRID@", str(len(config.P_Array)))
             filecontent = filecontent.replace("@P_ARRAY@", self._list_to_string(config.P_Array))
             filecontent = filecontent.replace("@Q_ARRAY@", self._list_to_string(config.Q_Array))
@@ -239,7 +239,7 @@ class HPLRunner:
             filecontent = filecontent.replace("@BCAST_ARRAY@", self._listEnum_to_string(config.BCAST_Array))
             filecontent = filecontent.replace("@LOOKAHEAD_DEPTH@", str(len(config.Depth_Array)))
             filecontent = filecontent.replace("@N_DEPTHS@", self._list_to_string(config.Depth_Array))
-            filecontent = filecontent.replace("@SWAP_TYPE@", str(config.Swap_Type))
+            filecontent = filecontent.replace("@SWAP_TYPE@", str(config.Swap_Type.value))
             filecontent = filecontent.replace("@SWAP_THRESHOLD@", str(config.Swap_Threshold))
             filecontent = filecontent.replace("@L1_FORM@", str(config.L1_Form))
             filecontent = filecontent.replace("@U_FORM@", str(config.U_Form))

@@ -177,7 +177,7 @@ class HPLOptimizer:
 
 
 
-        x= self.optimizer.ask(n_points=NUM_NODES)
+        x= self.optimizer.ask(n_points=(self._rank+1))
 
         if (len(x) > 1):
             x_res = x[self._rank]

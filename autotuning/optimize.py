@@ -11,9 +11,9 @@ from HPLOptimizer import HPLOptimizer
 from HPLConfig import HPLConfig
 from HPLResultReader import is_hpl_config, get_hpl_runs, process_hpl_csv
 from HPLRunner import HPLRunner
-from config import RESULTS_PATH, MAXIMUM_HPL_N, NUM_PROCESS, _availableMemory
+from config import RESULTS_PATH, MAXIMUM_HPL_N, NUM_PROCESS, _availableMemory, RANK,MIN_SPACE_N, MAX_SPACE_N
 
-model_name = "train_4"
+model_name = "test_2"
 
 WRITE_FOLDER = RESULTS_PATH.joinpath(model_name)
 LOG_FOLDER = WRITE_FOLDER.joinpath("logs")
@@ -35,8 +35,13 @@ iterations = 1
 if __name__ == "__main__":
     print("Reading data") 
     print(f"Memory MB {_availableMemory}")
-    print(f"bounds are {int(0.2*MAXIMUM_HPL_N)}  {int(MAXIMUM_HPL_N*0.85)}")
+    print(f"bounds are {MIN_SPACE_N} to {MAX_SPACE_N}")
     print(f"Numprocess {NUM_PROCESS}")
+    print(f"Rank {RANK}")
+
+    # Get number of running processes
+
+    optimizer._rank=RANK
     try:
         with open(optimizer_path, 'rb') as file:
             optimizer=pickle.load(file)
