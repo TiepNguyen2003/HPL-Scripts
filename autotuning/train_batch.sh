@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --nodes=1    # request nodes
-#SBATCH --partition short      # this job will be submitted to short queue queue
+#SBATCH --partition medium      # this job will be submitted to short queue queue
 #SBATCH --exclusive
 #SBATCH --mem=256000MB #this job is asked for 96G of total memory, use 0 if you want to use entire node memory
-#SBATCH --time=0-00:55:00 # 
+#SBATCH --time=0-20:00:00 # 
 #SBATCH --ntasks=56
 #SBATCH --ntasks-per-core=1
 #SBATCH --output=/home/tnguyen668/software/HPL-Scripts/autotuning/results/slurm/test_%x.%j.%a.out    # standard output will be redirected to this file
@@ -12,7 +12,6 @@
 #SBATCH --mail-type=ALL  #uncomment the first two lines if you want to receive     the email notifications
 #SBATCH --export=ALL
 ##SBATCH --constraint="sapphire-rapids"
-##SBATCH --array=1-4
 
 
 source /home/tnguyen668/software/HPL-Scripts/cluster/setpath.sh
@@ -26,7 +25,7 @@ export HPL_MAX_SPACE_N=1000
 export HPL_MIN_SPACE_N=200
 
 #export HPL_RANK=${SLURM_ARRAY_TASK_ID}
-#export HPL_NUM_NODES=${SLURM_ARRAY_TASK_COUNT}
+export HPL_NUM_NODES=4
 
 # tests
 
