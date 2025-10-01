@@ -38,6 +38,20 @@ config2 = HPLConfig(
     Depth_Array=[0],
 )
 
+config3 = HPLConfig(
+    N_Array=[98380],
+    NB_Array=[227],
+    P_Array=[8],
+    Q_Array=[7],
+    PMAP_Process_Mapping=PMapEnum.Column,
+    PFact_Array=[1],
+    NBMin_Array=[8],
+    NDIV_Array=[15],
+    RFact_Array=[2],
+    BCAST_Array=[2],
+    Depth_Array=[2],
+)
+
 slurmConfig = SLURMConfig(
     Nodes=1,
     Partition="test",
@@ -66,6 +80,15 @@ def test_runHPL():
 def test_runHPL_2():
     runner = HPLRunner()
     runner.setconfig(config2)
+    dataframe: pd.DataFrame = runner.runHPL()
+
+    dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
+    assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
+    assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
+
+def test_runHPL_3():
+    runner = HPLRunner()
+    runner.setconfig(config3)
     dataframe: pd.DataFrame = runner.runHPL()
 
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)

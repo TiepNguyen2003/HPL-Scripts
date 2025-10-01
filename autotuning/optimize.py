@@ -13,7 +13,7 @@ from HPLResultReader import is_hpl_config, get_hpl_runs, process_hpl_csv
 from HPLRunner import HPLRunner
 from config import RESULTS_PATH, MAXIMUM_HPL_N, NUM_PROCESS, _availableMemory, RANK,MIN_SPACE_N, MAX_SPACE_N
 
-model_name = "test_2"
+model_name = "train_6"
 
 WRITE_FOLDER = RESULTS_PATH.joinpath(model_name)
 LOG_FOLDER = WRITE_FOLDER.joinpath("logs")
@@ -41,13 +41,14 @@ if __name__ == "__main__":
 
     # Get number of running processes
 
-    optimizer._rank=RANK
+    
     try:
         with open(optimizer_path, 'rb') as file:
             optimizer=pickle.load(file)
     except FileNotFoundError:
         optimizer = HPLOptimizer()
-        
+    optimizer._rank=RANK
+
     try:
         with open(processed_file_path, "rb") as file:
             processed_files_str = json.load(file)

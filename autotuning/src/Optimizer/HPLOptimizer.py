@@ -179,9 +179,10 @@ class HPLOptimizer:
 
         x= self.optimizer.ask(n_points=(self._rank+1))
 
-        if (len(x) > 1):
-            x_res = x[self._rank]
-        else:
-            x_res=x
-
+        #if (len(x) > 1):
+        #    x_res = x[self._rank]
+        #else:
+        #    x_res=x
+        x_res = x[self._rank]
+        print(x_res)
         return self._space_to_config(x_res)

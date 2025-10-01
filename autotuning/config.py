@@ -10,13 +10,13 @@ load_dotenv()
 HPL_EXEC_FOLDER_PATH : Path= Path("/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles")
 RESULTS_PATH= Path(__file__).parent.joinpath("results")
 
-NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 1))
+NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 56))
 
 
-_availableMemory = int(os.getenv("HPL_RUNNER_MEM", "30000")) # memory in mb
+_availableMemory = int(os.getenv("HPL_RUNNER_MEM", "256000")) # memory in mb
 # Formula from https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
 
-MAXIMUM_HPL_N = int(sqrt(_availableMemory*1000000/struct.calcsize("d")))      
+MAXIMUM_HPL_N = int(sqrt(_availableMemory*1048576/struct.calcsize("d")))      
 MIN_SPACE_N = int(os.getenv("HPL_MIN_SPACE_N",MAXIMUM_HPL_N * 0.25))
 MAX_SPACE_N = int(os.getenv("HPL_MAX_SPACE_N",MAXIMUM_HPL_N * 0.95))
 

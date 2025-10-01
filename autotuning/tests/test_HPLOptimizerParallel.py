@@ -49,8 +49,10 @@ def test_request_parallel():
 
         optimizer.tell_runs_dataframe(df)
         con = optimizer.ask_next()
+        assert isinstance(con, HPLConfig), "Invalid config type"
         for val in configs:
-            assert con != config, "Duplicate configs created"
+            assert con != val, "Duplicate configs created"
+            
         configs.append(con)
 
 
