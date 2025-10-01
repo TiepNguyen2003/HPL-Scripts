@@ -254,6 +254,8 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
     
 
 def process_hpl_csv(path : Path) -> pd.DataFrame:
+
+    
     df = pd.read_csv(path)
 
     # Check dataframe

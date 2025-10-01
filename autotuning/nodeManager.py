@@ -2,7 +2,7 @@ import time
 from pssh.clients import SSHClient
 from pathlib import Path
 import re
-CHECK_INTERVAL = 2.5*60  # seconds
+CHECK_INTERVAL = 5*60  # seconds
 
 def check_slurm_jobs(client : SSHClient):
     cmd = 'squeue --user=tnguyen668 --name=hpl_autotuning_train --format="%.18i %.8j %.8u %.2t %.10M %.6D %R"'
@@ -25,7 +25,7 @@ def check_slurm_jobs(client : SSHClient):
 
 # Submits a batch job to slurm and returns the job id
 def submit_batch_job(client : SSHClient, rank : int) -> int:
-    cmd = f'sbatch --export=HPL_JOB_RANK={rank} /home/tnguyen668/software/HPL-Scripts/autotuning/train_batch.sh'
+    cmd = f'sbatch --export=HPL_RANK={rank + 1} /home/tnguyen668/software/HPL-Scripts/autotuning/train_batch.sh'
     output = client.run_command(cmd)
     jobid=0
     for line in output.stdout:

@@ -65,7 +65,7 @@ if __name__ == "__main__":
     for i in range(iterations): 
         print("Reading through paths")
         for path in DATAFRAME_FOLDER.iterdir():
-            if path.is_file() and (path not in processed_files):
+            if path.is_file() and (path not in processed_files) and (path.stat().st_size > 0):
                 if (path.suffix != ".csv"):
                     raise ValueError(f"{path} not .csv")
                 print(f"Processing {path}" )
