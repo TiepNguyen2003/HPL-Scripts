@@ -18,7 +18,7 @@ _availableMemory = int(os.getenv("HPL_RUNNER_MEM", "256000")) # memory in mb
 
 MAXIMUM_HPL_N = int(sqrt(_availableMemory*1048576/struct.calcsize("d")))      
 MIN_SPACE_N = int(os.getenv("HPL_MIN_SPACE_N",MAXIMUM_HPL_N * 0.25))
-MAX_SPACE_N = int(os.getenv("HPL_MAX_SPACE_N",MAXIMUM_HPL_N * 0.95))
+MAX_SPACE_N = int(os.getenv("HPL_MAX_SPACE_N",MAXIMUM_HPL_N * 0.85))
 
 JOB_NAME = str(os.getenv("HPL_JOB_NAME", "hpl_autotuning_train"))
 

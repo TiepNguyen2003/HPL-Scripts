@@ -27,9 +27,9 @@ class HPLOptimizer:
         Categorical(list(PFactEnum), name="PFact"),
         Categorical(list(RFactEnum), name="RFact"),
         Categorical(list(BCastEnum), name="BCast"),
-        Integer(1, 20, name="NBMin"),
-        Integer(2, 20, name = "NbDiv"),
-        Integer(0, 5, name="Depth"),
+        Integer(1, 24, name="NBMin"),
+        Integer(2, 24, name = "NbDiv"),
+        Integer(0, 1, name="Depth"),
         #Categorical([0,1], name="L1"),
         #Categorical([0,1], name="U"),
         #Categorical([0,1], name="Equilibration_Enabled")

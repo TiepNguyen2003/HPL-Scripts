@@ -255,9 +255,15 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
 
 def process_hpl_csv(path : Path) -> pd.DataFrame:
 
-    
-    df = pd.read_csv(path)
 
+    try:
+        df = pd.read_csv(path)
+    except pd.errors.EmptyDataError:
+        df = None
+
+    if df is None or df.empty:
+        print("Warning, empty dataframe")
+        return df
     # Check dataframe
     # TODO, implement dataframe check
     #
