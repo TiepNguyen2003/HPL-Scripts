@@ -7,8 +7,8 @@
 #SBATCH --ntasks-per-core=1
 #SBATCH --output=/home/tnguyen668/software/HPL-Scripts/autotuning/results/slurm/test_%x.%j.%a.out    # standard output will be redirected to this file
 #SBATCH --job-name=hpl_autotuning_train    # this is your job’s name
-#SBATCH --mail-user=tnguyen668@ucmerced.edu
-#SBATCH --mail-type=ALL  #uncomment the first two lines if you want to receive     the email notifications
+##SBATCH --mail-user=tnguyen668@ucmerced.edu
+##SBATCH --mail-type=ALL  #uncomment the first two lines if you want to receive     the email notifications
 #SBATCH --export=ALL
 ##SBATCH --constraint="sapphire-rapids"
 

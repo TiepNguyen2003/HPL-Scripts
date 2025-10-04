@@ -84,6 +84,10 @@ class HPLOptimizer:
         self.optimizer.tell(x, gflops)
     
     def tell_runs_dataframe(self, df : pd.DataFrame):
+        if df is None or df.empty:
+            print("Warning, empty dataframe")
+            return
+
         required_columns = {'N',
                             'NB',
                             'P',
@@ -101,6 +105,28 @@ class HPLOptimizer:
             raise ValueError("DF does not contain columns")
         
         filtered_df = df[df['passed'] == True]
+        filtered_df = filtered_df[(filtered_df['N'] >= MIN_SPACE_N) & (filtered_df['N'] <= MAX_SPACE_N)]
+        filtered_df = filtered_df[filtered_df['Depth'] <= 1]
+        filtered_df = filtered_df[(filtered_df['NB'] > 32) & (filtered_df['NB'] <= 300)]
+        filtered_df = filtered_df[(filtered_df['Nbmin'] >= 1) & (filtered_df['Nbmin'] <= 24)]
+        filtered_df = filtered_df[(filtered_df['Nbdiv'] >= 2) & (filtered_df['Nbdiv'] <= 24)]
+
+        if (filtered_df.empty):
+            print("Warning, no valid data to tell optimizer")
+            return
+        '''
+        Integer(MIN_SPACE_N, MAX_SPACE_N, name="N"),
+        Integer(32,300, name="NB"), # recommended to be 256
+        Integer(0, NUM_PROCESS,name="P"),
+        #Integer(0, NUM_PROCESS,name="Q"),
+        #Categorical(list(PMapEnum), name="PMap"),
+        Categorical(list(PFactEnum), name="PFact"),
+        Categorical(list(RFactEnum), name="RFact"),
+        Categorical(list(BCastEnum), name="BCast"),
+        Integer(1, 24, name="NBMin"),
+        Integer(2, 24, name = "NbDiv"),
+        Integer(0, 1, name="Depth"),
+        '''
 
         X = filtered_df[["N","NB", "P", "PFact", "RFact", "BCast", "Nbmin", "Nbdiv", "Depth"]].values.tolist()
         Y = (filtered_df['Gflops'].values * -1).tolist()
