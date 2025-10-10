@@ -42,6 +42,7 @@ hpl_residual_regex = re.compile(
 )
 
 '''
+Reads an HPL output and returns the result as a dataframe
 TODO, write documentation on this type of result
 '''
 def process_hpl_output(file : Path) -> pd.DataFrame:
@@ -50,13 +51,13 @@ def process_hpl_output(file : Path) -> pd.DataFrame:
     
     hpl_runs : List[HPL_Run] = get_hpl_runs(file)
     df = pd.DataFrame([run.__dict__ for run in hpl_runs])
-
-    
     return df
 #https://github.com/learnbyexample/py_regular_expressions
 hpl_config_regex= re.compile(r"(\w+)\s*:\s*(.+)")
 
-
+'''
+Reads an HPL result and returns its config
+'''
 def get_hpl_config(file : Path) -> HPLConfig:
 
     if is_hpl_config(file) == False:
@@ -176,6 +177,10 @@ def get_hpl_config(file : Path) -> HPLConfig:
     )
     return config
 
+
+'''
+Reads an HPL result and returns the list of HPL_Runs
+'''
 def get_hpl_runs(file : Path) -> List[HPL_Run]:
 
     if is_hpl_config(file) == False:
@@ -253,6 +258,9 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
     return runs
     
 
+'''
+Returns an HPLresult csv as a cleaned dataframe
+'''
 def process_hpl_csv(path : Path) -> pd.DataFrame:
 
 
@@ -277,4 +285,9 @@ def process_hpl_csv(path : Path) -> pd.DataFrame:
     return df
 
 
-    
+'''
+Returns a list of HPL runs from a dataframe
+'''
+def get_hpl_runs_from_dataframe(df : pd.DataFrame) -> List[HPL_Run]:
+    hpl_runs = [HPL_Run(**row.to_dict()) for _, row in df.iterrows()]
+    return hpl_runs

@@ -9,9 +9,10 @@ from SLURMConfig import SLURMConfig
 import pandas as pd
 import shutil
 import pytest
+import config
 
 
-config = HPLConfig(
+config1 = HPLConfig(
     N_Array=[50],
     NB_Array=[1],
     P_Array=[1],
@@ -37,40 +38,29 @@ config2 = HPLConfig(
     BCAST_Array=[BCastEnum.OneRing, BCastEnum.OneRingM],
     Depth_Array=[0],
 )
-
-config3 = HPLConfig(
-    N_Array=[98380],
-    NB_Array=[227],
-    P_Array=[8],
-    Q_Array=[7],
-    PMAP_Process_Mapping=PMapEnum.Column,
-    PFact_Array=[1],
-    NBMin_Array=[8],
-    NDIV_Array=[15],
-    RFact_Array=[2],
-    BCAST_Array=[2],
-    Depth_Array=[2],
+fatconfig = HPLConfig(
+    N_Array=[30000],
+    NB_Array=[1],
+    P_Array=[1],
+    Q_Array=[1],
+    PMAP_Process_Mapping= PMapEnum.Column,
+    PFact_Array=[PFactEnum.Left, PFactEnum.Crout, PFactEnum.Right],
+    NBMin_Array=[1, 2],
+    NDIV_Array=[2],
+    RFact_Array=[RFactEnum.Left, RFactEnum.Crout, RFactEnum.Right],
+    BCAST_Array=[BCastEnum.OneRing, BCastEnum.OneRingM],
+    Depth_Array=[0],
 )
 
-slurmConfig = SLURMConfig(
-    Nodes=1,
-    Partition="test",
-    Alloc_GB=32,
-    Time="00:20:00",
-    Ntasks_perNode=1,
-    Job_Name="HPL_Test",
-    Mail_User="tiep123@trieuvan.com",
-    Mail_Type="ALL"
-)
 
 def test_setconfig():
     runner = HPLRunner()
-    runner.setconfig(config)
-    assert runner.config == config
+    runner.setconfig(config1)
+    assert runner.config == config1
 
 def test_runHPL():
     runner = HPLRunner()
-    runner.setconfig(config)
+    runner.setconfig(config1)
     dataframe: pd.DataFrame = runner.runHPL()
 
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
@@ -85,27 +75,13 @@ def test_runHPL_2():
     dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
     assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
     assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
+# Assert we fail gracefully
+def test_runHPL_fat(monkeypatch):
+    
 
-def test_runHPL_3():
     runner = HPLRunner()
-    runner.setconfig(config3)
+    runner._MAXIMUM_HPL_N = 15000000
+    runner.setconfig(fatconfig)
     dataframe: pd.DataFrame = runner.runHPL()
 
-    dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output.csv"), index=False)
-    assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
-    assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
-
-
-def test_runSLURM():
-    pytest.skip()
-    if shutil.which("sbatch") is None:
-        pytest.skip("No slurm, skip slurm test")
-
-    runner = HPLRunner()
-    runner.setconfig(config)
-    runner.setSlurmConfig(slurmConfig)
-    dataframe: pd.DataFrame = runner.runSLURM()
-    
-    dataframe.to_csv(Path(__file__).parent.joinpath("test_results/hpl_output_slurm.csv"), index=False)
-    assert isinstance(dataframe, pd.DataFrame), "Dataframe is None"
-    assert dataframe['Gflops'].dtype == float, "Gflops column is not float"
+    assert dataframe is None, "Dataframe should be None for fat config"

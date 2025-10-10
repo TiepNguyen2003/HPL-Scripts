@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Install_Path="/home/tnguyen668/software/hpl-portable"
+Install_Path="/home/tiep_nguyen/HPL-Folder"
 Build_Process_Count=8
 
 OPENMPI_URL="https://download.open-mpi.org/release/open-mpi/v5.0/openmpi-5.0.8.tar.gz"
