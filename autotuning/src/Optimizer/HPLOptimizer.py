@@ -12,6 +12,7 @@ import pandas as pd
 from typing import List
 from config import MAXIMUM_HPL_N, NUM_PROCESS, MIN_SPACE_N, MAX_SPACE_N, NUM_NODES, RANK
 from HPLConfig import HPLConfig, HPL_Run, PMapEnum, BCastEnum, PFactEnum, RFactEnum
+from HPLResultReader import get_hpl_runs_from_dataframe
 
 
 
@@ -51,60 +52,33 @@ class HPLOptimizer:
 
     def tell_run(self, run : HPL_Run):
         #TODO, add flexibility so that variables can easily be removed from space
-        x = [run.N, 
-            run.NB, 
-            run.P, 
-            #run.Q,
+        x = self._run_to_space(run)
+        self.optimizer.tell(x, run.Gflops)
+
+    def tell_runs(self, runs : List[HPL_Run]):
+        #TODO, add flexibility so that variables can easily be removed from space
+        x = [self._run_to_space(r) for r in runs]
+        gflops : List[float] = list(map(lambda c: -1 * c.Gflops, runs)) # we maximize Gflops by minimizing -Gflops
+        self.optimizer.tell(x, gflops)
+    
+    def tell_runs_dataframe(self, df : pd.DataFrame):
+        
+        self.tell_runs(get_hpl_runs_from_dataframe(df))
+
+    '''
+    Converts an HPL run to a point in search space
+    '''
+    def _run_to_space(self, run : HPL_Run) -> List: 
+        return [
+            run.N,
+            run.NB,
             run.PFact,
             run.RFact,
             run.BCast,
             run.Nbmin,
             run.Nbdiv,
             run.Depth
-            ]
-        self.optimizer.tell(x, run.Gflops)
-
-    def tell_runs(self, runs : List[HPL_Run]):
-        #TODO, add flexibility so that variables can easily be removed from space
-        x = [[r.N, 
-              r.NB, 
-              r.P, 
-              #r.Q, 
-              r.PFact, 
-              r.RFact, 
-              r.BCast, 
-              r.Nbmin, 
-              r.Nbdiv, 
-              r.Depth] for r in runs]
-
-        gflops : List[float] = list(map(lambda c: -1 * c.Gflops, runs)) # maximize Gflops by minimizing -Gflops
-
-
-        
-        self.optimizer.tell(x, gflops)
-    
-    def tell_runs_dataframe(self, df : pd.DataFrame):
-        required_columns = {'N',
-                            'NB',
-                            'P',
-                            #'Q',
-                            'BCast',
-                            'PFact',
-                            'RFact',
-                            'Nbmin',
-                            'Nbdiv',
-                            'Depth',
-                            'Gflops',
-                            'passed'}
-        
-        if required_columns.issubset(df.columns) == False:
-            raise ValueError("DF does not contain columns")
-        
-        filtered_df = df[df['passed'] == True]
-
-        X = filtered_df[["N","NB", "P", "PFact", "RFact", "BCast", "Nbmin", "Nbdiv", "Depth"]].values.tolist()
-        Y = (filtered_df['Gflops'].values * -1).tolist()
-        self.optimizer.tell(X,Y)
+        ]
 
     '''
     Converts a point in the search space to a config
@@ -156,7 +130,8 @@ class HPLOptimizer:
             NDIV_Array=_NDIV_Array,
             L1_Form=0,
             U_Form=0,
-            Equilibration_Enabled=1
+            Equilibration_Enabled=1,
+            Swap_Threshold=max(_NBMin_Array)
         )
         return hpl_config
 

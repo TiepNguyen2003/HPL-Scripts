@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-HPL_EXEC_FOLDER_PATH : Path= Path("/home/tnguyen668/software/hpl-portable/hpl-2.3/bin/pinnacles")
+HPL_EXEC_FOLDER_PATH : Path= Path(os.getenv("HPL_EXEC_FOLDER_PATH"))
 RESULTS_PATH= Path(__file__).parent.joinpath("results")
 
 NUM_PROCESS=int(os.getenv("HPL_NUM_PROCESS", 56))
@@ -18,7 +18,7 @@ _availableMemory = int(os.getenv("HPL_RUNNER_MEM", "256000")) # memory in mb
 
 MAXIMUM_HPL_N = int(sqrt(_availableMemory*1048576/struct.calcsize("d")))      
 MIN_SPACE_N = int(os.getenv("HPL_MIN_SPACE_N",MAXIMUM_HPL_N * 0.25))
-MAX_SPACE_N = int(os.getenv("HPL_MAX_SPACE_N",MAXIMUM_HPL_N * 0.85))
+MAX_SPACE_N = int(os.getenv("HPL_MAX_SPACE_N",15000000))#MAXIMUM_HPL_N * 0.85))
 
 JOB_NAME = str(os.getenv("HPL_JOB_NAME", "hpl_autotuning_train"))
 
