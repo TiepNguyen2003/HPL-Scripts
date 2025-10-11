@@ -103,10 +103,10 @@ class HPLRunner:
 
            
         # Run HPL
-        print("the commandline is {}".format(['mpirun', '-np', str(self.numProcess), './xhpl']))
+        print("the commandline is {}".format(['srun', '-np', str(self.numProcess), './xhpl']))
         try:
             result_content = subprocess.run(
-                ['mpirun', '-np', str(self.numProcess), './xhpl'], stdout=subprocess.PIPE,
+                ['srun', './xhpl'], stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
                 cwd=HPL_EXEC_FOLDER_PATH
