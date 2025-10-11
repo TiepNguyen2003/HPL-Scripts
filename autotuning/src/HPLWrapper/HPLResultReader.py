@@ -1,10 +1,23 @@
+from dataclasses import dataclass
 import sys
 from pathlib import Path
 import re
 from typing import List
 import pandas as pd
+from datetime import time
+
 csv_path = Path("/home/tiep_nguyen/IndySCC-HPL-Scripts/analysis/output.csv")
 from HPLConfig import HPLConfig, HPL_Run, BCastEnum, PFactEnum, RFactEnum, PMapEnum, SwapEnum
+
+@dataclass
+class HPL_RESULT():
+    hpl_runs : List[HPL_Run]
+    startTime : time
+    endTime : time
+
+
+    
+
 
 def is_hpl_config(file: Path) -> bool:
     results=[]
@@ -15,7 +28,6 @@ def is_hpl_config(file: Path) -> bool:
             if "High-Performance Linpack benchmark" in str(curLine):
                 return True 
         return False
-
 
 # designed to match with output from HPL_pdtest.C
 hpl_result_regex = re.compile(
@@ -246,6 +258,7 @@ def get_hpl_runs(file : Path) -> List[HPL_Run]:
                     L1=config.L1_Form,
                     U=config.U_Form,
                     SwapType=config.Swap_Type,
+                    Swap_Threshold=config.Swap_Threshold,
                     residual=curResidual['residual'],
                     passed=curResidual['status']
 
