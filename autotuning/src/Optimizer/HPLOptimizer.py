@@ -1,3 +1,4 @@
+from math import sqrt
 import numpy as np
 
 from skopt import Optimizer
@@ -21,8 +22,8 @@ class HPLOptimizer:
     optimizer : Optimizer    
     hpl_config_space = Space([
         Integer(MIN_SPACE_N, MAX_SPACE_N, name="N"),
-        Integer(32,300, name="NB"), # recommended to be 256
-        Integer(0, NUM_PROCESS,name="P"),
+        Integer(8,40, name="NB"), # recommended to be 256
+        Integer(0, NUM_PROCESS,name="P"), # HPL prefers slightly flat process grids
         #Integer(0, NUM_PROCESS,name="Q"),
         #Categorical(list(PMapEnum), name="PMap"),
         Categorical(list(PFactEnum), name="PFact"),
@@ -52,14 +53,14 @@ class HPLOptimizer:
 
     def tell_run(self, run : HPL_Run):
         #TODO, add flexibility so that variables can easily be removed from space
-        x = self._run_to_space(run)
-        self.optimizer.tell(x, run.Gflops)
+        x,y = self._run_to_space(run)
+        self.optimizer.tell(x, y)
 
     def tell_runs(self, runs : List[HPL_Run]):
         #TODO, add flexibility so that variables can easily be removed from space
-        x = [self._run_to_space(r) for r in runs]
-        gflops : List[float] = list(map(lambda c: -1 * c.Gflops, runs)) # we maximize Gflops by minimizing -Gflops
-        self.optimizer.tell(x, gflops)
+        x_list, y_list = zip(*[self._run_to_space(r) for r in runs])
+
+        self.optimizer.tell(x_list, y_list)
     
     def tell_runs_dataframe(self, df : pd.DataFrame):
         
@@ -67,89 +68,19 @@ class HPLOptimizer:
 
     '''
     Converts an HPL run to a point in search space
+    We use negative gflops because the y seeks to minimized
     '''
-    def _run_to_space(self, run : HPL_Run) -> List: 
-        return [
-            run.N,
-            run.NB,
+    def _run_to_space(self, run : HPL_Run) -> tuple[List, float]: 
+        x = [run.N,
+            int(run.NB/4),
             run.PFact,
             run.RFact,
             run.BCast,
             run.Nbmin,
             run.Nbdiv,
-            run.Depth
-        ]
-            ]
-        self.optimizer.tell(x, run.Gflops)
-
-    def tell_runs(self, runs : List[HPL_Run]):
-        #TODO, add flexibility so that variables can easily be removed from space
-        x = [[r.N, 
-              r.NB, 
-              r.P, 
-              #r.Q, 
-              r.PFact, 
-              r.RFact, 
-              r.BCast, 
-              r.Nbmin, 
-              r.Nbdiv, 
-              r.Depth] for r in runs]
-
-        gflops : List[float] = list(map(lambda c: -1 * c.Gflops, runs)) # maximize Gflops by minimizing -Gflops
-
-
-        
-        self.optimizer.tell(x, gflops)
-    
-    def tell_runs_dataframe(self, df : pd.DataFrame):
-        if df is None or df.empty:
-            print("Warning, empty dataframe")
-            return
-
-        required_columns = {'N',
-                            'NB',
-                            'P',
-                            #'Q',
-                            'BCast',
-                            'PFact',
-                            'RFact',
-                            'Nbmin',
-                            'Nbdiv',
-                            'Depth',
-                            'Gflops',
-                            'passed'}
-        
-        if required_columns.issubset(df.columns) == False:
-            raise ValueError("DF does not contain columns")
-        
-        filtered_df = df[df['passed'] == True]
-        filtered_df = filtered_df[(filtered_df['N'] >= MIN_SPACE_N) & (filtered_df['N'] <= MAX_SPACE_N)]
-        filtered_df = filtered_df[filtered_df['Depth'] <= 1]
-        filtered_df = filtered_df[(filtered_df['NB'] > 32) & (filtered_df['NB'] <= 300)]
-        filtered_df = filtered_df[(filtered_df['Nbmin'] >= 1) & (filtered_df['Nbmin'] <= 24)]
-        filtered_df = filtered_df[(filtered_df['Nbdiv'] >= 2) & (filtered_df['Nbdiv'] <= 24)]
-
-        if (filtered_df.empty):
-            print("Warning, no valid data to tell optimizer")
-            return
-        '''
-        Integer(MIN_SPACE_N, MAX_SPACE_N, name="N"),
-        Integer(32,300, name="NB"), # recommended to be 256
-        Integer(0, NUM_PROCESS,name="P"),
-        #Integer(0, NUM_PROCESS,name="Q"),
-        #Categorical(list(PMapEnum), name="PMap"),
-        Categorical(list(PFactEnum), name="PFact"),
-        Categorical(list(RFactEnum), name="RFact"),
-        Categorical(list(BCastEnum), name="BCast"),
-        Integer(1, 24, name="NBMin"),
-        Integer(2, 24, name = "NbDiv"),
-        Integer(0, 1, name="Depth"),
-        '''
-
-        X = filtered_df[["N","NB", "P", "PFact", "RFact", "BCast", "Nbmin", "Nbdiv", "Depth"]].values.tolist()
-        Y = (filtered_df['Gflops'].values * -1).tolist()
-        self.optimizer.tell(X,Y)
-
+            run.Depth]
+        return (x, -run.Gflops)
+          
     '''
     Converts a point in the search space to a config
     '''
@@ -178,7 +109,7 @@ class HPLOptimizer:
             param_dict['NB'] = param_dict['N']
 
         _N_Array.append(param_dict['N'])
-        _NB_Array.append(param_dict['NB'])
+        _NB_Array.append(param_dict['NB']*4)
         _P_Array.append(param_dict['P'])
         _Q_Array.append(param_dict['Q'])
         _PFact_Array.add(param_dict['PFact'])
@@ -201,6 +132,7 @@ class HPLOptimizer:
             L1_Form=0,
             U_Form=0,
             Equilibration_Enabled=1,
+            Swap_Type=2,
             Swap_Threshold=max(_NBMin_Array)
         )
         return hpl_config
