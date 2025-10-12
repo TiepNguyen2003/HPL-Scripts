@@ -13,7 +13,7 @@ from HPLResultReader import is_hpl_config, get_hpl_runs, process_hpl_csv
 from HPLRunner import HPLRunner
 from config import RESULTS_PATH, MAXIMUM_HPL_N, NUM_PROCESS, _availableMemory, RANK,MIN_SPACE_N, MAX_SPACE_N
 
-model_name = "train_6"
+model_name = "train_8"
 
 WRITE_FOLDER = RESULTS_PATH.joinpath(model_name)
 LOG_FOLDER = WRITE_FOLDER.joinpath("logs")

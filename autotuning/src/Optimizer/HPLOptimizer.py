@@ -3,6 +3,7 @@ import numpy as np
 
 from skopt import Optimizer
 from skopt.space import Real, Integer, Categorical, Space
+from scikitoptUtils import is_within_space
 
 import sys
 import os
@@ -54,13 +55,15 @@ class HPLOptimizer:
     def tell_run(self, run : HPL_Run):
         #TODO, add flexibility so that variables can easily be removed from space
         x,y = self._run_to_space(run)
-        self.optimizer.tell(x, y)
 
+        if (is_within_space(self.hpl_config_space, x)):
+            self.optimizer.tell(x, y)
+        else:
+            print("Warning, x not in space")
     def tell_runs(self, runs : List[HPL_Run]):
         #TODO, add flexibility so that variables can easily be removed from space
-        x_list, y_list = zip(*[self._run_to_space(r) for r in runs])
-
-        self.optimizer.tell(x_list, y_list)
+        for run in runs:
+            self.tell_run(run)
     
     def tell_runs_dataframe(self, df : pd.DataFrame):
         
@@ -73,14 +76,17 @@ class HPLOptimizer:
     def _run_to_space(self, run : HPL_Run) -> tuple[List, float]: 
         x = [run.N,
             int(run.NB/4),
+            run.P,
             run.PFact,
             run.RFact,
             run.BCast,
             run.Nbmin,
             run.Nbdiv,
             run.Depth]
+        
         return (x, -run.Gflops)
-          
+
+
     '''
     Converts a point in the search space to a config
     '''

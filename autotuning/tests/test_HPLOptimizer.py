@@ -21,7 +21,7 @@ TEST_SAMPLES_FOLDER = Path(__file__).parent.joinpath("test_samples")
 
 test_space = Space([
     Integer(1,2000000, name="N"),
-    Integer(1,300, name="NB"), # recommended to be 256
+    Integer(0,300, name="NB"), # recommended to be 256
     Integer(0, 16,name="P"),
     #Integer(0, 16,name="Q"),
     #Categorical(list(PMapEnum), name="PMap"),
