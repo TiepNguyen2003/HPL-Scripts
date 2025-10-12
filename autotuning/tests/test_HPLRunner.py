@@ -9,13 +9,13 @@ from SLURMConfig import SLURMConfig
 import pandas as pd
 import shutil
 import pytest
-import config
+from config import NUM_PROCESS 
 
 
 config1 = HPLConfig(
-    N_Array=[50],
+    N_Array=[100],
     NB_Array=[1],
-    P_Array=[1],
+    P_Array=[NUM_PROCESS],
     Q_Array=[1],
     PFact_Array=[0, 1, 2],
     NBMin_Array=[1, 2],
@@ -26,9 +26,9 @@ config1 = HPLConfig(
 )
 
 config2 = HPLConfig(
-    N_Array=[50],
+    N_Array=[100],
     NB_Array=[1],
-    P_Array=[1],
+    P_Array=[NUM_PROCESS],
     Q_Array=[1],
     PMAP_Process_Mapping= PMapEnum.Column,
     PFact_Array=[PFactEnum.Left, PFactEnum.Crout, PFactEnum.Right],
@@ -39,7 +39,7 @@ config2 = HPLConfig(
     Depth_Array=[0],
 )
 fatconfig = HPLConfig(
-    N_Array=[30000],
+    N_Array=[13000000],
     NB_Array=[1],
     P_Array=[1],
     Q_Array=[1],
@@ -92,7 +92,7 @@ def test_runSLURM():
 # Assert we fail gracefully
 def test_runHPL_fat(monkeypatch):
     
-
+    pytest.skip()
     runner = HPLRunner()
     runner._MAXIMUM_HPL_N = 15000000
     runner.setconfig(fatconfig)

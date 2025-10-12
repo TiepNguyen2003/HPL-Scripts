@@ -22,8 +22,8 @@ class HPLOptimizer:
     optimizer : Optimizer    
     hpl_config_space = Space([
         Integer(MIN_SPACE_N, MAX_SPACE_N, name="N"),
-        Integer(8,40, name="NB"), # recommended to be 256
-        Integer(0, NUM_PROCESS,name="P"), # HPL prefers slightly flat process grids
+        Integer(8,80, name="NB"), # Dimensions is in multiple of fours
+        Integer(0, NUM_PROCESS,name="P"),
         #Integer(0, NUM_PROCESS,name="Q"),
         #Categorical(list(PMapEnum), name="PMap"),
         Categorical(list(PFactEnum), name="PFact"),
